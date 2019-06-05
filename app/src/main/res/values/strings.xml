@@ -1,3 +1,25 @@
 <resources>
     <string name="app_name">AstroWeather2</string>
+    <string name="moonrise">Moonrise :</string>
+    <string name="blank">_</string>
+    <string name="moonset">Moonset :</string>
+    <string name="next_new_moon">Next new moon :</string>
+    <string name="next_full_moon">Next full moon :</string>
+    <string name="moon_phase">Moon phase [%]:</string>
+    <string name="synodic_day">Synodic day :</string>
+    <string name="sunrise">Sunrise :</string>
+    <string name="sunset">Sunset :</string>
+    <string name="sunriseTime">Sunrise time :</string>
+    <string name="sunriseAzimuth">Sunrise azimuth :</string>
+    <string name="sunsetTime">Sunset time :</string>
+    <string name="sunsetAzimuth">Sunset azimuth :</string>
+    <string name="morning_twilight">Civil morning twilight :</string>
+    <string name="evening_twilight">Civil evening twilight :</string>
+    <string name="options_activity_name">Options</string>
+    <string name="moon_info">MOON INFO :</string>
+    <string name="sun_info">SUN INFO :</string>
+    <string name="latitude">Latitude :</string>
+    <string name="refresh_frequency">Refresh frequency [s] :</string>
+    <string name="longitude">Longitude :</string>
+    <string name="options">Options</string>
 </resources>

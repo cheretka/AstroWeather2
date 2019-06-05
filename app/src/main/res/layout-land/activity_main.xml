@@ -4,121 +4,116 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:orientation="vertical"
+    android:orientation="horizontal"
     tools:context=".MainActivity">
 
     <android.support.constraint.ConstraintLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:layout_margin="5dp"
-        android:layout_weight="3">
+        android:layout_weight="1">
 
         <TextView
             android:id="@+id/timeText"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginTop="5dp"
-            android:layout_marginBottom="5dp"
+            android:layout_marginTop="5sp"
+            android:layout_marginBottom="10sp"
             android:text="current time"
             android:textSize="@dimen/text_size"
-            app:layout_constraintBottom_toBottomOf="@+id/optionsButton"
-            app:layout_constraintStart_toStartOf="@+id/latitudeLabel"
-            app:layout_constraintTop_toTopOf="@+id/optionsButton" />
+            app:layout_constraintBottom_toTopOf="@+id/latitudeLabel"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="0.5"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
 
         <TextView
             android:id="@+id/latitudeLabel"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginTop="5dp"
             android:text="@string/latitude"
             android:textSize="@dimen/text_size"
-            app:layout_constraintBottom_toTopOf="@+id/longitudeLabel"
-            app:layout_constraintStart_toStartOf="@+id/longitudeLabel"
+            app:layout_constraintBottom_toTopOf="@+id/latitudeText"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="0.5"
+            app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/timeText" />
 
         <TextView
             android:id="@+id/longitudeLabel"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginTop="5dp"
             android:text="@string/longitude"
             android:textSize="@dimen/text_size"
-            app:layout_constraintBottom_toTopOf="@+id/frequencyLabel"
-            app:layout_constraintStart_toStartOf="@+id/frequencyLabel"
-            app:layout_constraintTop_toBottomOf="@+id/latitudeLabel" />
+            app:layout_constraintBottom_toTopOf="@+id/longitudeText"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="0.5"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/latitudeText" />
 
         <TextView
             android:id="@+id/latitudeText"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginTop="5dp"
             android:text="@string/blank"
             android:textSize="@dimen/text_size"
-            app:layout_constraintBottom_toBottomOf="@+id/latitudeLabel"
-            app:layout_constraintEnd_toEndOf="@+id/optionsButton"
+            app:layout_constraintBottom_toTopOf="@+id/longitudeLabel"
+            app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintHorizontal_bias="0.5"
-            app:layout_constraintStart_toEndOf="@+id/latitudeLabel"
-            app:layout_constraintStart_toStartOf="@+id/optionsButton"
-            app:layout_constraintTop_toTopOf="@+id/latitudeLabel"
-            app:layout_constraintVertical_bias="0.729" />
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/latitudeLabel" />
 
         <TextView
             android:id="@+id/longitudeText"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginTop="5dp"
             android:text="@string/blank"
             android:textSize="@dimen/text_size"
-            app:layout_constraintBottom_toBottomOf="@+id/longitudeLabel"
-            app:layout_constraintEnd_toEndOf="@+id/latitudeText"
-            app:layout_constraintHorizontal_bias="0.5"
-            app:layout_constraintStart_toEndOf="@+id/longitudeLabel"
-            app:layout_constraintStart_toStartOf="@+id/latitudeText"
-            app:layout_constraintTop_toTopOf="@+id/longitudeLabel"
-            app:layout_constraintVertical_bias="0.0" />
-
-        <TextView
-            android:id="@+id/frequencyLabel"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="5dp"
-            android:text="@string/refresh_frequency"
-            android:textSize="@dimen/text_size"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toStartOf="@+id/frequencyText"
+            app:layout_constraintBottom_toTopOf="@+id/frequencyLabel"
+            app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintHorizontal_bias="0.5"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/longitudeLabel" />
 
         <TextView
+            android:id="@+id/frequencyLabel"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="5dp"
+            android:layout_marginEnd="5dp"
+            android:text="@string/refresh_frequency"
+            android:textSize="@dimen/text_size"
+            app:layout_constraintBottom_toTopOf="@+id/frequencyText"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="0.5"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/longitudeText" />
+
+        <TextView
             android:id="@+id/frequencyText"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginTop="5dp"
             android:text="@string/blank"
             android:textSize="@dimen/text_size"
-            app:layout_constraintBottom_toBottomOf="@+id/frequencyLabel"
-            app:layout_constraintEnd_toEndOf="@+id/longitudeText"
+            app:layout_constraintBottom_toTopOf="@+id/optionsButton"
+            app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintHorizontal_bias="0.5"
-            app:layout_constraintStart_toEndOf="@+id/frequencyLabel"
-            app:layout_constraintStart_toStartOf="@+id/longitudeText"
-            app:layout_constraintTop_toTopOf="@+id/frequencyLabel"
-            app:layout_constraintVertical_bias="0.0" />
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/frequencyLabel" />
 
         <Button
             android:id="@+id/optionsButton"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginTop="5dp"
-            android:layout_marginBottom="5dp"
             android:text="@string/options"
-            android:textAppearance="@style/TextAppearance.AppCompat.Small"
             android:textSize="@dimen/text_size"
-            app:layout_constraintBottom_toTopOf="@+id/latitudeText"
+            android:textAppearance="@style/TextAppearance.AppCompat.Small"
+            android:layout_marginBottom="5sp"
+            app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintHorizontal_bias="0.5"
-            app:layout_constraintStart_toEndOf="@+id/timeText"
-            app:layout_constraintTop_toTopOf="parent" />
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/frequencyText" />
     </android.support.constraint.ConstraintLayout>
 
     <android.support.v4.view.ViewPager
