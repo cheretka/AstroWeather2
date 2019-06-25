@@ -22,4 +22,12 @@
     <string name="refresh_frequency">Refresh frequency [s] :</string>
     <string name="longitude">Longitude :</string>
     <string name="options">Options</string>
+    <string name="time">Time :</string>
+    <string name="temperature">Temperature :</string>
+    <string name="pressure">Pressure :</string>
+    <string name="weather">Weather :</string>
+    <string name="wind_force">Wind force :</string>
+    <string name="wind_direction">Wind direction :</string>
+    <string name="humidity">Humidity :</string>
+    <string name="visibility">Visibility :</string>
 </resources>
