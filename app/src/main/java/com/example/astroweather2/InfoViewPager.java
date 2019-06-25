@@ -12,7 +12,7 @@ public class InfoViewPager extends FragmentPagerAdapter {
 
     @Override
     public int getCount() {
-        return 3;
+        return 4;
     }
 
     @Override
@@ -21,8 +21,10 @@ public class InfoViewPager extends FragmentPagerAdapter {
             return SunInfoFragment.newInstance();
         } else if(position==1) {
             return MoonInfoFragment.newInstance();
-        } else {
+        } else if(position==2) {
             return LocationFragment.newInstance();
+        } else {
+            return WindFragment.newInstance();
         }
     }
 
