@@ -15,7 +15,7 @@
 
         <TextView
             android:id="@+id/timeText"
-            android:layout_width="wrap_content"
+            android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_marginTop="5dp"
             android:layout_marginBottom="5dp"
@@ -43,8 +43,8 @@
             android:layout_marginTop="5dp"
             android:text="@string/longitude"
             android:textSize="@dimen/text_size"
-            app:layout_constraintBottom_toTopOf="@+id/frequencyLabel"
-            app:layout_constraintStart_toStartOf="@+id/frequencyLabel"
+            app:layout_constraintBottom_toTopOf="@+id/cityLabel"
+            app:layout_constraintStart_toStartOf="@+id/cityLabel"
             app:layout_constraintTop_toBottomOf="@+id/latitudeLabel" />
 
         <TextView
@@ -78,31 +78,32 @@
             app:layout_constraintVertical_bias="0.0" />
 
         <TextView
-            android:id="@+id/frequencyLabel"
-            android:layout_width="wrap_content"
+            android:id="@+id/cityLabel"
+            android:layout_width="0dp"
             android:layout_height="wrap_content"
+            android:layout_marginStart="10dp"
             android:layout_marginTop="5dp"
-            android:text="@string/refresh_frequency"
+            android:text="@string/city"
             android:textSize="@dimen/text_size"
             app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toStartOf="@+id/frequencyText"
+            app:layout_constraintEnd_toStartOf="@+id/cityText"
             app:layout_constraintHorizontal_bias="0.5"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/longitudeLabel" />
 
         <TextView
-            android:id="@+id/frequencyText"
+            android:id="@+id/cityText"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginTop="5dp"
             android:text="@string/blank"
             android:textSize="@dimen/text_size"
-            app:layout_constraintBottom_toBottomOf="@+id/frequencyLabel"
+            app:layout_constraintBottom_toBottomOf="@+id/cityLabel"
             app:layout_constraintEnd_toEndOf="@+id/longitudeText"
             app:layout_constraintHorizontal_bias="0.5"
-            app:layout_constraintStart_toEndOf="@+id/frequencyLabel"
+            app:layout_constraintStart_toEndOf="@+id/cityLabel"
             app:layout_constraintStart_toStartOf="@+id/longitudeText"
-            app:layout_constraintTop_toTopOf="@+id/frequencyLabel"
+            app:layout_constraintTop_toTopOf="@+id/cityLabel"
             app:layout_constraintVertical_bias="0.0" />
 
         <Button

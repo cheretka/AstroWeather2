@@ -18,15 +18,15 @@ public class InfoViewPager extends FragmentPagerAdapter {
     @Override
     public Fragment getItem(int position) {
         if(position==0){
-            return SunInfoFragment.newInstance();
-        } else if(position==1) {
-            return MoonInfoFragment.newInstance();
-        } else if(position==2) {
             return LocationFragment.newInstance();
-        } else if(position==3) {
+        } else if(position==1) {
             return WindFragment.newInstance();
-        } else {
+        } else if(position==2) {
             return ForecastFragment.newInstance();
+        } else if(position==3) {
+            return SunInfoFragment.newInstance();
+        } else {
+            return MoonInfoFragment.newInstance();
         }
     }
 

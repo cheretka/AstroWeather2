@@ -69,28 +69,28 @@
             android:layout_height="wrap_content"
             android:text="@string/blank"
             android:textSize="@dimen/text_size"
-            app:layout_constraintBottom_toTopOf="@+id/frequencyLabel"
+            app:layout_constraintBottom_toTopOf="@+id/cityLabel"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintHorizontal_bias="0.5"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/longitudeLabel" />
 
         <TextView
-            android:id="@+id/frequencyLabel"
+            android:id="@+id/cityLabel"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginStart="5dp"
             android:layout_marginEnd="5dp"
-            android:text="@string/refresh_frequency"
+            android:text="@string/city"
             android:textSize="@dimen/text_size"
-            app:layout_constraintBottom_toTopOf="@+id/frequencyText"
+            app:layout_constraintBottom_toTopOf="@+id/cityText"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintHorizontal_bias="0.5"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/longitudeText" />
 
         <TextView
-            android:id="@+id/frequencyText"
+            android:id="@+id/cityText"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="@string/blank"
@@ -99,7 +99,7 @@
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintHorizontal_bias="0.5"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/frequencyLabel" />
+            app:layout_constraintTop_toBottomOf="@+id/cityLabel" />
 
         <Button
             android:id="@+id/optionsButton"
@@ -113,7 +113,7 @@
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintHorizontal_bias="0.5"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/frequencyText" />
+            app:layout_constraintTop_toBottomOf="@+id/cityText" />
     </android.support.constraint.ConstraintLayout>
 
     <android.support.v4.view.ViewPager
