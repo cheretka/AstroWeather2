@@ -43,6 +43,9 @@ public class MainActivity extends AppCompatActivity {
     private final String PREF_LATITUDE_FIELD = "latitudeField";
     private final String PREF_LONGITUDE_FIELD = "longitudeField";
     private final String PREF_FREQUENCY_FIELD = "frequencyField";
+    private final String PREF_CITY_NAME_FIELD = "cityNameField";
+    private final String PREF_CITY_ID_FIELD = "cityIdField";
+    private final String PREF_UNITS_FIELD = "unitsField";
     private SharedPreferences preferences;
 
     private SimpleDateFormat simpleDateTimeFormat = new SimpleDateFormat("yyyy.MM.dd\nHH:mm:ss z");
@@ -69,6 +72,7 @@ public class MainActivity extends AppCompatActivity {
     private String frequency;
 
     private Button optionsBtn;
+    private Button changeCityBtn;
 
     private MoonViewModel moonViewModel;
     private SunViewModel sunViewModel;
@@ -113,7 +117,7 @@ public class MainActivity extends AppCompatActivity {
 
         latitudeTextView.setText(preferences.getString(PREF_LATITUDE_FIELD, ""));
         longitudeTextView.setText(preferences.getString(PREF_LONGITUDE_FIELD, ""));
-        longitudeTextView.setText(preferences.getString(PREF_LONGITUDE_FIELD, ""));
+        cityTextView.setText(preferences.getString(PREF_CITY_NAME_FIELD, ""));
 
         frequency = preferences.getString(PREF_FREQUENCY_FIELD, "");
 
@@ -123,6 +127,15 @@ public class MainActivity extends AppCompatActivity {
             public void onClick(View v) {
                 Intent intent = new Intent(getApplicationContext(), OptionsActivity.class);
                 startActivityForResult(intent,1);
+            }
+        });
+
+        changeCityBtn = findViewById(R.id.changeCityBtn);
+        changeCityBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(getApplicationContext(), LocationListActivity.class);
+                startActivity(intent);
             }
         });
 
@@ -178,7 +191,10 @@ public class MainActivity extends AppCompatActivity {
         };
 
         if(isConnectedToNetwork(getApplicationContext())){
-            findWeather();
+            String id = preferences.getString(PREF_CITY_ID_FIELD, "");
+            if(!id.isEmpty()){
+                findWeather(id, "Metric");
+            }
         } else {
             Toast.makeText(getApplicationContext(), "No network connection. \nWeather data may be outdated.", Toast.LENGTH_LONG).show();
         }
@@ -266,9 +282,12 @@ public class MainActivity extends AppCompatActivity {
         return isConnected;
     }
 
-    public void findWeather()
+    public void findWeather(String cityId, String units)
     {
-        String url ="http://api.openweathermap.org/data/2.5/weather?q=London&appid=2e4f5773b45fa8319b89a903841ba0c4&units=Metric";
+        StringBuilder urlBuilder = new StringBuilder();
+        urlBuilder.append("http://api.openweathermap.org/data/2.5/weather?id=").append(cityId)
+                .append("&appid=2e4f5773b45fa8319b89a903841ba0c4&units=").append(units);
+        String url = urlBuilder.toString();
 
         JsonObjectRequest jorw = new JsonObjectRequest(Request.Method.GET, url, null, new Response.Listener<JSONObject>() {
             @Override
@@ -322,12 +341,15 @@ public class MainActivity extends AppCompatActivity {
         }, new Response.ErrorListener() {
             @Override
             public void onErrorResponse(VolleyError error) {
-                Toast.makeText(getApplicationContext(), "error", Toast.LENGTH_SHORT).show();
+                Toast.makeText(getApplicationContext(), "error today weather", Toast.LENGTH_SHORT).show();
             }
         }
         );
 
-        String url2 ="http://api.openweathermap.org/data/2.5/forecast?q=London&appid=2e4f5773b45fa8319b89a903841ba0c4&units=Metric";
+        StringBuilder urlBuilder2 = new StringBuilder();
+        urlBuilder2.append("http://api.openweathermap.org/data/2.5/forecast?id=").append(cityId)
+                .append("&appid=2e4f5773b45fa8319b89a903841ba0c4&units=").append(units);
+        String url2 = urlBuilder2.toString();
 
         JsonObjectRequest jorf = new JsonObjectRequest(Request.Method.GET, url2, null, new Response.Listener<JSONObject>() {
             @Override
@@ -337,7 +359,7 @@ public class MainActivity extends AppCompatActivity {
                     Calendar c = Calendar.getInstance();
                     JSONArray array = response.getJSONArray("list");
 
-                    JSONObject object = array.getJSONObject(12);
+                    JSONObject object = array.getJSONObject(8);
                     JSONObject main_object = object.getJSONObject("main");
                     String temp = String.valueOf(main_object.getDouble("temp"));
                     JSONArray weather_array = object.getJSONArray("weather");
@@ -351,7 +373,7 @@ public class MainActivity extends AppCompatActivity {
                     forecastViewModel.setDate1Desc(description);
                     forecastViewModel.setDate1Image(icon);
 
-                    object = array.getJSONObject(20);
+                    object = array.getJSONObject(16);
                     main_object = object.getJSONObject("main");
                     temp = String.valueOf(main_object.getDouble("temp"));
                     weather_array = object.getJSONArray("weather");
@@ -365,7 +387,7 @@ public class MainActivity extends AppCompatActivity {
                     forecastViewModel.setDate2Desc(description);
                     forecastViewModel.setDate2Image(icon);
 
-                    object = array.getJSONObject(28);
+                    object = array.getJSONObject(24);
                     main_object = object.getJSONObject("main");
                     temp = String.valueOf(main_object.getDouble("temp"));
                     weather_array = object.getJSONArray("weather");
@@ -379,7 +401,7 @@ public class MainActivity extends AppCompatActivity {
                     forecastViewModel.setDate3Desc(description);
                     forecastViewModel.setDate3Image(icon);
 
-                    object = array.getJSONObject(36);
+                    object = array.getJSONObject(32);
                     main_object = object.getJSONObject("main");
                     temp = String.valueOf(main_object.getDouble("temp"));
                     weather_array = object.getJSONArray("weather");
@@ -415,7 +437,7 @@ public class MainActivity extends AppCompatActivity {
         }, new Response.ErrorListener() {
             @Override
             public void onErrorResponse(VolleyError error) {
-                Toast.makeText(getApplicationContext(), "error", Toast.LENGTH_SHORT).show();
+                Toast.makeText(getApplicationContext(), "error forecast", Toast.LENGTH_SHORT).show();
             }
         }
         );

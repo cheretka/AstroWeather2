@@ -11,17 +11,18 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:layout_margin="5dp"
-        android:layout_weight="3">
+        android:layout_marginTop="5dp"
+        android:layout_weight="2">
 
         <TextView
             android:id="@+id/timeText"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:layout_marginTop="5dp"
-            android:layout_marginBottom="5dp"
+            android:layout_marginBottom="8dp"
+            android:gravity="bottom"
             android:text="current time"
             android:textSize="@dimen/text_size"
-            app:layout_constraintBottom_toBottomOf="@+id/optionsButton"
+            app:layout_constraintBottom_toTopOf="@+id/longitudeText"
             app:layout_constraintStart_toStartOf="@+id/latitudeLabel"
             app:layout_constraintTop_toTopOf="@+id/optionsButton" />
 
@@ -29,23 +30,21 @@
             android:id="@+id/latitudeLabel"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginTop="5dp"
             android:text="@string/latitude"
             android:textSize="@dimen/text_size"
-            app:layout_constraintBottom_toTopOf="@+id/longitudeLabel"
+            app:layout_constraintBottom_toBottomOf="@+id/latitudeText"
             app:layout_constraintStart_toStartOf="@+id/longitudeLabel"
-            app:layout_constraintTop_toBottomOf="@+id/timeText" />
+            app:layout_constraintTop_toTopOf="@+id/latitudeText" />
 
         <TextView
             android:id="@+id/longitudeLabel"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginTop="5dp"
             android:text="@string/longitude"
             android:textSize="@dimen/text_size"
-            app:layout_constraintBottom_toTopOf="@+id/cityLabel"
+            app:layout_constraintBottom_toBottomOf="@+id/longitudeText"
             app:layout_constraintStart_toStartOf="@+id/cityLabel"
-            app:layout_constraintTop_toBottomOf="@+id/latitudeLabel" />
+            app:layout_constraintTop_toTopOf="@+id/longitudeText" />
 
         <TextView
             android:id="@+id/latitudeText"
@@ -54,13 +53,13 @@
             android:layout_marginTop="5dp"
             android:text="@string/blank"
             android:textSize="@dimen/text_size"
-            app:layout_constraintBottom_toBottomOf="@+id/latitudeLabel"
+            app:layout_constraintBottom_toTopOf="@+id/longitudeText"
             app:layout_constraintEnd_toEndOf="@+id/optionsButton"
             app:layout_constraintHorizontal_bias="0.5"
             app:layout_constraintStart_toEndOf="@+id/latitudeLabel"
             app:layout_constraintStart_toStartOf="@+id/optionsButton"
-            app:layout_constraintTop_toTopOf="@+id/latitudeLabel"
-            app:layout_constraintVertical_bias="0.729" />
+            app:layout_constraintTop_toBottomOf="@+id/optionsButton"
+            app:layout_constraintVertical_bias="0.0" />
 
         <TextView
             android:id="@+id/longitudeText"
@@ -69,12 +68,12 @@
             android:layout_marginTop="5dp"
             android:text="@string/blank"
             android:textSize="@dimen/text_size"
-            app:layout_constraintBottom_toBottomOf="@+id/longitudeLabel"
+            app:layout_constraintBottom_toTopOf="@+id/cityText"
             app:layout_constraintEnd_toEndOf="@+id/latitudeText"
             app:layout_constraintHorizontal_bias="0.5"
             app:layout_constraintStart_toEndOf="@+id/longitudeLabel"
             app:layout_constraintStart_toStartOf="@+id/latitudeText"
-            app:layout_constraintTop_toTopOf="@+id/longitudeLabel"
+            app:layout_constraintTop_toBottomOf="@+id/latitudeText"
             app:layout_constraintVertical_bias="0.0" />
 
         <TextView
@@ -82,14 +81,14 @@
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_marginStart="10dp"
-            android:layout_marginTop="5dp"
+            android:layout_marginBottom="8dp"
             android:text="@string/city"
             android:textSize="@dimen/text_size"
-            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintBottom_toTopOf="@+id/changeCityBtn"
             app:layout_constraintEnd_toStartOf="@+id/cityText"
-            app:layout_constraintHorizontal_bias="0.5"
+            app:layout_constraintHorizontal_bias="0"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/longitudeLabel" />
+            app:layout_constraintTop_toTopOf="@+id/cityText" />
 
         <TextView
             android:id="@+id/cityText"
@@ -98,12 +97,12 @@
             android:layout_marginTop="5dp"
             android:text="@string/blank"
             android:textSize="@dimen/text_size"
-            app:layout_constraintBottom_toBottomOf="@+id/cityLabel"
+            app:layout_constraintBottom_toTopOf="@+id/changeCityBtn"
             app:layout_constraintEnd_toEndOf="@+id/longitudeText"
             app:layout_constraintHorizontal_bias="0.5"
             app:layout_constraintStart_toEndOf="@+id/cityLabel"
             app:layout_constraintStart_toStartOf="@+id/longitudeText"
-            app:layout_constraintTop_toTopOf="@+id/cityLabel"
+            app:layout_constraintTop_toBottomOf="@+id/longitudeText"
             app:layout_constraintVertical_bias="0.0" />
 
         <Button
@@ -119,7 +118,22 @@
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintHorizontal_bias="0.5"
             app:layout_constraintStart_toEndOf="@+id/timeText"
-            app:layout_constraintTop_toTopOf="parent" />
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintVertical_bias="1.0" />
+
+        <Button
+            android:id="@+id/changeCityBtn"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="8dp"
+            android:text="@string/change_city"
+            android:textAppearance="@style/TextAppearance.AppCompat.Small"
+            android:textSize="@dimen/text_size"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="@+id/optionsButton"
+            app:layout_constraintStart_toStartOf="@+id/optionsButton"
+            app:layout_constraintTop_toBottomOf="@+id/cityText"
+            app:layout_constraintVertical_bias="0.0" />
     </android.support.constraint.ConstraintLayout>
 
     <android.support.v4.view.ViewPager

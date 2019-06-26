@@ -109,6 +109,20 @@
             app:layout_constraintHorizontal_bias="0.5"
             app:layout_constraintStart_toEndOf="@+id/timeText"
             app:layout_constraintTop_toTopOf="parent" />
+
+        <Button
+            android:id="@+id/changeCityBtn"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="8dp"
+            android:text="@string/change_city"
+            android:textAppearance="@style/TextAppearance.AppCompat.Small"
+            android:textSize="@dimen/text_size"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="@+id/optionsButton"
+            app:layout_constraintStart_toStartOf="@+id/optionsButton"
+            app:layout_constraintTop_toBottomOf="@+id/cityText"
+            app:layout_constraintVertical_bias="0.0" />
     </android.support.constraint.ConstraintLayout>
 
     <FrameLayout

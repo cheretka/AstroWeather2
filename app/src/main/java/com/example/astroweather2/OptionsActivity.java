@@ -19,6 +19,10 @@ public class OptionsActivity extends AppCompatActivity {
     private final String PREF_LATITUDE_FIELD = "latitudeField";
     private final String PREF_LONGITUDE_FIELD = "longitudeField";
     private final String PREF_FREQUENCY_FIELD = "frequencyField";
+    private final String PREF_CITY_NAME_FIELD = "cityNameField";
+    private final String PREF_CITY_ID_FIELD = "cityIdField";
+    private final String PREF_UNITS_FIELD = "unitsField";
+
     private SharedPreferences preferences;
     private EditText latitudeEdit;
     private EditText longitudeEdit;

@@ -26,6 +26,22 @@
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value="com.example.astroweather2.MainActivity" />
         </activity>
+        <activity
+            android:name="com.example.astroweather2.LocationListActivity"
+            android:label="@string/location_list_activity_name"
+            android:parentActivityName="com.example.astroweather2.MainActivity">
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value="com.example.astroweather2.MainActivity" />
+        </activity>
+        <activity
+            android:name="com.example.astroweather2.AddLocationActivity"
+            android:label="@string/add_location_activity_name"
+            android:parentActivityName="com.example.astroweather2.LocationListActivity">
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value="com.example.astroweather2.LocationListActivity" />>
+        </activity>
     </application>
 
 </manifest>
