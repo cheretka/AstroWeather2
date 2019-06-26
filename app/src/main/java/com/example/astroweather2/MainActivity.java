@@ -288,10 +288,12 @@ public class MainActivity extends AppCompatActivity {
                     String wind_deg = String.valueOf(Double.isNaN(deg) ? "no data" : deg);
                     String visibility = response.getString("visibility");
                     String description = object.getString("description");
+                    String icon = "o"+object.getString("icon");
 
                     locationViewModel.setTemp(temp);
                     locationViewModel.setWeather(description);
                     locationViewModel.setPressure(press);
+                    locationViewModel.setIcon(icon);
 
                     windViewModel.setWindForce(wind_speed);
                     windViewModel.setWindDirection(wind_deg);
@@ -329,7 +331,5 @@ public class MainActivity extends AppCompatActivity {
         Toast.makeText(getApplicationContext(), "found.", Toast.LENGTH_LONG).show();
 
     }
-
-
 
 }

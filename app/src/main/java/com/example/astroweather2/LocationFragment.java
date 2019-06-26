@@ -1,11 +1,13 @@
 package com.example.astroweather2;
 
 import android.arch.lifecycle.ViewModelProviders;
+import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageView;
 import android.widget.TextView;
 
 public class LocationFragment extends Fragment {
@@ -15,6 +17,7 @@ public class LocationFragment extends Fragment {
     private TextView tempTextView;
     private TextView pressureTextView;
     private TextView weatherTextView;
+    private ImageView imageView;
 
     public static LocationFragment newInstance() {
         LocationFragment fragment = new LocationFragment();
@@ -40,10 +43,16 @@ public class LocationFragment extends Fragment {
         tempTextView = view.findViewById(R.id.tempText);
         pressureTextView = view.findViewById(R.id.pressureText);
         weatherTextView = view.findViewById(R.id.weatherText);
+        imageView = view.findViewById(R.id.imageView);
 
         tempTextView.setText(locationViewModel.getTemp() != null ? locationViewModel.getTemp() : "");
         pressureTextView.setText(locationViewModel.getPressure() != null ? locationViewModel.getPressure() : "");
         weatherTextView.setText(locationViewModel.getWeather() != null ? locationViewModel.getWeather() : "");
+
+        String icon = locationViewModel.getIcon();
+        if(icon != null){
+            imageView.setImageResource(getContext().getResources().getIdentifier(icon, "drawable", getContext().getPackageName()));
+        }
 
         return view;
 
