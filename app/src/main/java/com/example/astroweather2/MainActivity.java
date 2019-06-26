@@ -45,7 +45,8 @@ public class MainActivity extends AppCompatActivity {
     private final String PREF_FREQUENCY_FIELD = "frequencyField";
     private SharedPreferences preferences;
 
-    private SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy.MM.dd\nHH:mm:ss z");
+    private SimpleDateFormat simpleDateTimeFormat = new SimpleDateFormat("yyyy.MM.dd\nHH:mm:ss z");
+    private SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy.MM.dd");
     private FragmentPagerAdapter fragmentPagerAdapter;
     private final FragmentManager fm = getSupportFragmentManager();
     private ViewPager vp;
@@ -130,7 +131,7 @@ public class MainActivity extends AppCompatActivity {
         timeRunnable = new Runnable() {
             @Override
             public void run() {
-                String currentTime = simpleDateFormat.format(new Date());
+                String currentTime = simpleDateTimeFormat.format(new Date());
                 currentTimeTextView.setText(currentTime);
                 //Toast.makeText(getApplicationContext(), "timeRunnable", Toast.LENGTH_SHORT).show();
                 handler.postDelayed(this, 1000);
@@ -267,10 +268,9 @@ public class MainActivity extends AppCompatActivity {
 
     public void findWeather()
     {
-        Toast.makeText(getApplicationContext(), "try to find.", Toast.LENGTH_LONG).show();
         String url ="http://api.openweathermap.org/data/2.5/weather?q=London&appid=2e4f5773b45fa8319b89a903841ba0c4&units=Metric";
 
-        JsonObjectRequest jor = new JsonObjectRequest(Request.Method.GET, url, null, new Response.Listener<JSONObject>() {
+        JsonObjectRequest jorw = new JsonObjectRequest(Request.Method.GET, url, null, new Response.Listener<JSONObject>() {
             @Override
             public void onResponse(JSONObject response) {
                 try
@@ -326,9 +326,103 @@ public class MainActivity extends AppCompatActivity {
             }
         }
         );
+
+        String url2 ="http://api.openweathermap.org/data/2.5/forecast?q=London&appid=2e4f5773b45fa8319b89a903841ba0c4&units=Metric";
+
+        JsonObjectRequest jorf = new JsonObjectRequest(Request.Method.GET, url2, null, new Response.Listener<JSONObject>() {
+            @Override
+            public void onResponse(JSONObject response) {
+                try
+                {
+                    Calendar c = Calendar.getInstance();
+                    JSONArray array = response.getJSONArray("list");
+
+                    JSONObject object = array.getJSONObject(12);
+                    JSONObject main_object = object.getJSONObject("main");
+                    String temp = String.valueOf(main_object.getDouble("temp"));
+                    JSONArray weather_array = object.getJSONArray("weather");
+                    JSONObject weather_object = weather_array.getJSONObject(0);
+                    String description = weather_object.getString("description");
+                    String icon = "o"+weather_object.getString("icon");
+                    c.add(Calendar.DAY_OF_MONTH,1);
+
+                    forecastViewModel.setDate1(simpleDateFormat.format(c.getTime()));
+                    forecastViewModel.setDate1Temp(temp);
+                    forecastViewModel.setDate1Desc(description);
+                    forecastViewModel.setDate1Image(icon);
+
+                    object = array.getJSONObject(20);
+                    main_object = object.getJSONObject("main");
+                    temp = String.valueOf(main_object.getDouble("temp"));
+                    weather_array = object.getJSONArray("weather");
+                    weather_object = weather_array.getJSONObject(0);
+                    description = weather_object.getString("description");
+                    icon = "o"+weather_object.getString("icon");
+                    c.add(Calendar.DAY_OF_MONTH,1);
+
+                    forecastViewModel.setDate2(simpleDateFormat.format(c.getTime()));
+                    forecastViewModel.setDate2Temp(temp);
+                    forecastViewModel.setDate2Desc(description);
+                    forecastViewModel.setDate2Image(icon);
+
+                    object = array.getJSONObject(28);
+                    main_object = object.getJSONObject("main");
+                    temp = String.valueOf(main_object.getDouble("temp"));
+                    weather_array = object.getJSONArray("weather");
+                    weather_object = weather_array.getJSONObject(0);
+                    description = weather_object.getString("description");
+                    icon = "o"+weather_object.getString("icon");
+                    c.add(Calendar.DAY_OF_MONTH,1);
+
+                    forecastViewModel.setDate3(simpleDateFormat.format(c.getTime()));
+                    forecastViewModel.setDate3Temp(temp);
+                    forecastViewModel.setDate3Desc(description);
+                    forecastViewModel.setDate3Image(icon);
+
+                    object = array.getJSONObject(36);
+                    main_object = object.getJSONObject("main");
+                    temp = String.valueOf(main_object.getDouble("temp"));
+                    weather_array = object.getJSONArray("weather");
+                    weather_object = weather_array.getJSONObject(0);
+                    description = weather_object.getString("description");
+                    icon = "o"+weather_object.getString("icon");
+                    c.add(Calendar.DAY_OF_MONTH,1);
+
+                    forecastViewModel.setDate4(simpleDateFormat.format(c.getTime()));
+                    forecastViewModel.setDate4Temp(temp);
+                    forecastViewModel.setDate4Desc(description);
+                    forecastViewModel.setDate4Image(icon);
+
+                    if(isTablet){
+                        FragmentTransaction ft = fm.beginTransaction();
+
+                        moonInfoFragment = MoonInfoFragment.newInstance();
+                        ft.replace(R.id.fragment_container, moonInfoFragment);
+
+                        sunInfoFragment = SunInfoFragment.newInstance();
+                        ft.replace(R.id.fragment_container2, sunInfoFragment);
+                        ft.commit();
+                    } else {
+                        vp.getAdapter().notifyDataSetChanged();
+                    }
+
+                }catch(JSONException e)
+                {
+                    e.printStackTrace();
+                }
+
+            }
+        }, new Response.ErrorListener() {
+            @Override
+            public void onErrorResponse(VolleyError error) {
+                Toast.makeText(getApplicationContext(), "error", Toast.LENGTH_SHORT).show();
+            }
+        }
+        );
+
         RequestQueue queue = Volley.newRequestQueue(this);
-        queue.add(jor);
-        Toast.makeText(getApplicationContext(), "found.", Toast.LENGTH_LONG).show();
+        queue.add(jorw);
+        queue.add(jorf);
 
     }
 
