@@ -114,16 +114,11 @@ public class LocationListActivity extends AppCompatActivity {
                     preferencesEditor.commit();
 
                 }
+
+                Intent intent = new Intent(getApplicationContext(), MainActivity.class).setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+                startActivity(intent);
+                finish();
             }
         });
     }
-
-//    @Override
-//    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-//
-//        if (requestCode == 1 && resultCode == Activity.RESULT_OK) {
-//
-//
-//        }
-//    }
 }

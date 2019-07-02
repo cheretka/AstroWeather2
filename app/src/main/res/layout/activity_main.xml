@@ -134,6 +134,17 @@
             app:layout_constraintStart_toStartOf="@+id/optionsButton"
             app:layout_constraintTop_toBottomOf="@+id/cityText"
             app:layout_constraintVertical_bias="0.0" />
+
+        <Button
+            android:id="@+id/refreshBtn"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/refresh_weather"
+            android:textAppearance="@style/TextAppearance.AppCompat.Small"
+            android:textSize="@dimen/text_size"
+            app:layout_constraintBottom_toBottomOf="@+id/changeCityBtn"
+            app:layout_constraintStart_toStartOf="@+id/cityLabel"
+            app:layout_constraintTop_toTopOf="@+id/changeCityBtn" />
     </android.support.constraint.ConstraintLayout>
 
     <android.support.v4.view.ViewPager

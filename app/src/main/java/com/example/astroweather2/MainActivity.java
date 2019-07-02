@@ -16,6 +16,7 @@ import android.support.v4.app.FragmentTransaction;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.AppCompatActivity;
 import android.text.TextUtils;
+import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
@@ -34,6 +35,12 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.io.BufferedReader;
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.io.OutputStreamWriter;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
@@ -47,6 +54,9 @@ public class MainActivity extends AppCompatActivity {
     private final String PREF_CITY_ID_FIELD = "cityIdField";
     private final String PREF_UNITS_FIELD = "unitsField";
     private SharedPreferences preferences;
+
+    private final String WEATHER_JSON_FILE_NAME = "weather.json";
+    private final String FORECAST_JSON_FILE_NAME = "forecast";
 
     private SimpleDateFormat simpleDateTimeFormat = new SimpleDateFormat("yyyy.MM.dd\nHH:mm:ss z");
     private SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy.MM.dd");
@@ -70,9 +80,11 @@ public class MainActivity extends AppCompatActivity {
     private TextView cityTextView;
 
     private String frequency;
+    private String units;
 
     private Button optionsBtn;
     private Button changeCityBtn;
+    private Button refreshBtn;
 
     private MoonViewModel moonViewModel;
     private SunViewModel sunViewModel;
@@ -120,6 +132,7 @@ public class MainActivity extends AppCompatActivity {
         cityTextView.setText(preferences.getString(PREF_CITY_NAME_FIELD, ""));
 
         frequency = preferences.getString(PREF_FREQUENCY_FIELD, "");
+        units = preferences.getString(PREF_UNITS_FIELD, "default");
 
         optionsBtn = findViewById(R.id.optionsButton);
         optionsBtn.setOnClickListener(new View.OnClickListener() {
@@ -136,6 +149,14 @@ public class MainActivity extends AppCompatActivity {
             public void onClick(View v) {
                 Intent intent = new Intent(getApplicationContext(), LocationListActivity.class);
                 startActivity(intent);
+            }
+        });
+
+        refreshBtn = findViewById(R.id.refreshBtn);
+        refreshBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                updateWeatherData();
             }
         });
 
@@ -190,16 +211,25 @@ public class MainActivity extends AppCompatActivity {
             }
         };
 
+        updateWeatherData();
+    }
+
+    private void updateWeatherData() {
         if(isConnectedToNetwork(getApplicationContext())){
             String id = preferences.getString(PREF_CITY_ID_FIELD, "");
+            units = preferences.getString(PREF_UNITS_FIELD,"default");
+
             if(!id.isEmpty()){
-                findWeather(id, "Metric");
+                findWeather(id, units);
             }
         } else {
             Toast.makeText(getApplicationContext(), "No network connection. \nWeather data may be outdated.", Toast.LENGTH_LONG).show();
+            try {
+                getWeatherFromFile();
+            } catch (JSONException e) {
+                e.printStackTrace();
+            }
         }
-
-
     }
 
     @Override
@@ -248,6 +278,7 @@ public class MainActivity extends AppCompatActivity {
                     }
                 }
             };
+            updateWeatherData();
         }
     }
 
@@ -294,43 +325,8 @@ public class MainActivity extends AppCompatActivity {
             public void onResponse(JSONObject response) {
                 try
                 {
-                    JSONObject main_object = response.getJSONObject("main");
-                    JSONObject wind_object = response.getJSONObject("wind");
-                    JSONArray array = response.getJSONArray("weather");
-                    JSONObject object = array.getJSONObject(0);
-                    String temp = String.valueOf(main_object.getDouble("temp"));
-                    String press = String.valueOf(main_object.getDouble("pressure"));
-                    String hum = String.valueOf(main_object.getDouble("humidity"));
-                    String wind_speed = String.valueOf(wind_object.getDouble("speed"));
-                    double deg = wind_object.optDouble("deg",Double.NaN);
-
-                    String wind_deg = String.valueOf(Double.isNaN(deg) ? "no data" : deg);
-                    String visibility = response.getString("visibility");
-                    String description = object.getString("description");
-                    String icon = "o"+object.getString("icon");
-
-                    locationViewModel.setTemp(temp);
-                    locationViewModel.setWeather(description);
-                    locationViewModel.setPressure(press);
-                    locationViewModel.setIcon(icon);
-
-                    windViewModel.setWindForce(wind_speed);
-                    windViewModel.setWindDirection(wind_deg);
-                    windViewModel.setHumidity(hum);
-                    windViewModel.setVisibility(visibility);
-
-                    if(isTablet){
-                        FragmentTransaction ft = fm.beginTransaction();
-
-                        moonInfoFragment = MoonInfoFragment.newInstance();
-                        ft.replace(R.id.fragment_container, moonInfoFragment);
-
-                        sunInfoFragment = SunInfoFragment.newInstance();
-                        ft.replace(R.id.fragment_container2, sunInfoFragment);
-                        ft.commit();
-                    } else {
-                        vp.getAdapter().notifyDataSetChanged();
-                    }
+                    writeToFile(WEATHER_JSON_FILE_NAME, response.toString());
+                    updateWeatherFromJsonObject(response);
 
                 }catch(JSONException e)
                 {
@@ -356,77 +352,8 @@ public class MainActivity extends AppCompatActivity {
             public void onResponse(JSONObject response) {
                 try
                 {
-                    Calendar c = Calendar.getInstance();
-                    JSONArray array = response.getJSONArray("list");
-
-                    JSONObject object = array.getJSONObject(8);
-                    JSONObject main_object = object.getJSONObject("main");
-                    String temp = String.valueOf(main_object.getDouble("temp"));
-                    JSONArray weather_array = object.getJSONArray("weather");
-                    JSONObject weather_object = weather_array.getJSONObject(0);
-                    String description = weather_object.getString("description");
-                    String icon = "o"+weather_object.getString("icon");
-                    c.add(Calendar.DAY_OF_MONTH,1);
-
-                    forecastViewModel.setDate1(simpleDateFormat.format(c.getTime()));
-                    forecastViewModel.setDate1Temp(temp);
-                    forecastViewModel.setDate1Desc(description);
-                    forecastViewModel.setDate1Image(icon);
-
-                    object = array.getJSONObject(16);
-                    main_object = object.getJSONObject("main");
-                    temp = String.valueOf(main_object.getDouble("temp"));
-                    weather_array = object.getJSONArray("weather");
-                    weather_object = weather_array.getJSONObject(0);
-                    description = weather_object.getString("description");
-                    icon = "o"+weather_object.getString("icon");
-                    c.add(Calendar.DAY_OF_MONTH,1);
-
-                    forecastViewModel.setDate2(simpleDateFormat.format(c.getTime()));
-                    forecastViewModel.setDate2Temp(temp);
-                    forecastViewModel.setDate2Desc(description);
-                    forecastViewModel.setDate2Image(icon);
-
-                    object = array.getJSONObject(24);
-                    main_object = object.getJSONObject("main");
-                    temp = String.valueOf(main_object.getDouble("temp"));
-                    weather_array = object.getJSONArray("weather");
-                    weather_object = weather_array.getJSONObject(0);
-                    description = weather_object.getString("description");
-                    icon = "o"+weather_object.getString("icon");
-                    c.add(Calendar.DAY_OF_MONTH,1);
-
-                    forecastViewModel.setDate3(simpleDateFormat.format(c.getTime()));
-                    forecastViewModel.setDate3Temp(temp);
-                    forecastViewModel.setDate3Desc(description);
-                    forecastViewModel.setDate3Image(icon);
-
-                    object = array.getJSONObject(32);
-                    main_object = object.getJSONObject("main");
-                    temp = String.valueOf(main_object.getDouble("temp"));
-                    weather_array = object.getJSONArray("weather");
-                    weather_object = weather_array.getJSONObject(0);
-                    description = weather_object.getString("description");
-                    icon = "o"+weather_object.getString("icon");
-                    c.add(Calendar.DAY_OF_MONTH,1);
-
-                    forecastViewModel.setDate4(simpleDateFormat.format(c.getTime()));
-                    forecastViewModel.setDate4Temp(temp);
-                    forecastViewModel.setDate4Desc(description);
-                    forecastViewModel.setDate4Image(icon);
-
-                    if(isTablet){
-                        FragmentTransaction ft = fm.beginTransaction();
-
-                        moonInfoFragment = MoonInfoFragment.newInstance();
-                        ft.replace(R.id.fragment_container, moonInfoFragment);
-
-                        sunInfoFragment = SunInfoFragment.newInstance();
-                        ft.replace(R.id.fragment_container2, sunInfoFragment);
-                        ft.commit();
-                    } else {
-                        vp.getAdapter().notifyDataSetChanged();
-                    }
+                    writeToFile(FORECAST_JSON_FILE_NAME, response.toString());
+                    updateForecastFromJsonObject(response);
 
                 }catch(JSONException e)
                 {
@@ -447,5 +374,173 @@ public class MainActivity extends AppCompatActivity {
         queue.add(jorf);
 
     }
+
+    private void getWeatherFromFile() throws JSONException {
+        String s = readFromFile(WEATHER_JSON_FILE_NAME);
+        JSONObject weather = new JSONObject(s);
+        updateWeatherFromJsonObject(weather);
+
+        s = readFromFile(FORECAST_JSON_FILE_NAME);
+        JSONObject forecast = new JSONObject(s);
+        updateWeatherFromJsonObject(forecast);
+    }
+
+    private void updateForecastFromJsonObject(JSONObject response) throws JSONException {
+        Calendar c = Calendar.getInstance();
+        JSONArray array = response.getJSONArray("list");
+
+        JSONObject object = array.getJSONObject(8);
+        JSONObject main_object = object.getJSONObject("main");
+        String temp = String.valueOf(main_object.getDouble("temp"));
+        JSONArray weather_array = object.getJSONArray("weather");
+        JSONObject weather_object = weather_array.getJSONObject(0);
+        String description = weather_object.getString("description");
+        String icon = "o"+weather_object.getString("icon");
+        c.add(Calendar.DAY_OF_MONTH,1);
+
+        forecastViewModel.setDate1(simpleDateFormat.format(c.getTime()));
+        forecastViewModel.setDate1Temp(temp);
+        forecastViewModel.setDate1Desc(description);
+        forecastViewModel.setDate1Image(icon);
+
+        object = array.getJSONObject(16);
+        main_object = object.getJSONObject("main");
+        temp = String.valueOf(main_object.getDouble("temp"));
+        weather_array = object.getJSONArray("weather");
+        weather_object = weather_array.getJSONObject(0);
+        description = weather_object.getString("description");
+        icon = "o"+weather_object.getString("icon");
+        c.add(Calendar.DAY_OF_MONTH,1);
+
+        forecastViewModel.setDate2(simpleDateFormat.format(c.getTime()));
+        forecastViewModel.setDate2Temp(temp);
+        forecastViewModel.setDate2Desc(description);
+        forecastViewModel.setDate2Image(icon);
+
+        object = array.getJSONObject(24);
+        main_object = object.getJSONObject("main");
+        temp = String.valueOf(main_object.getDouble("temp"));
+        weather_array = object.getJSONArray("weather");
+        weather_object = weather_array.getJSONObject(0);
+        description = weather_object.getString("description");
+        icon = "o"+weather_object.getString("icon");
+        c.add(Calendar.DAY_OF_MONTH,1);
+
+        forecastViewModel.setDate3(simpleDateFormat.format(c.getTime()));
+        forecastViewModel.setDate3Temp(temp);
+        forecastViewModel.setDate3Desc(description);
+        forecastViewModel.setDate3Image(icon);
+
+        object = array.getJSONObject(32);
+        main_object = object.getJSONObject("main");
+        temp = String.valueOf(main_object.getDouble("temp"));
+        weather_array = object.getJSONArray("weather");
+        weather_object = weather_array.getJSONObject(0);
+        description = weather_object.getString("description");
+        icon = "o"+weather_object.getString("icon");
+        c.add(Calendar.DAY_OF_MONTH,1);
+
+        forecastViewModel.setDate4(simpleDateFormat.format(c.getTime()));
+        forecastViewModel.setDate4Temp(temp);
+        forecastViewModel.setDate4Desc(description);
+        forecastViewModel.setDate4Image(icon);
+
+        if(isTablet){
+            FragmentTransaction ft = fm.beginTransaction();
+
+            moonInfoFragment = MoonInfoFragment.newInstance();
+            ft.replace(R.id.fragment_container, moonInfoFragment);
+
+            sunInfoFragment = SunInfoFragment.newInstance();
+            ft.replace(R.id.fragment_container2, sunInfoFragment);
+            ft.commit();
+        } else {
+            vp.getAdapter().notifyDataSetChanged();
+        }
+    }
+
+    private void updateWeatherFromJsonObject(JSONObject response) throws JSONException {
+        JSONObject main_object = response.getJSONObject("main");
+        JSONObject wind_object = response.getJSONObject("wind");
+        JSONArray array = response.getJSONArray("weather");
+        JSONObject object = array.getJSONObject(0);
+        String temp = String.valueOf(main_object.getDouble("temp"));
+        String press = String.valueOf(main_object.getDouble("pressure"));
+        String hum = String.valueOf(main_object.getDouble("humidity"));
+        String wind_speed = String.valueOf(wind_object.getDouble("speed"));
+        double deg = wind_object.optDouble("deg",Double.NaN);
+
+        String wind_deg = String.valueOf(Double.isNaN(deg) ? "no data" : deg);
+        String visibility = response.getString("visibility");
+        String description = object.getString("description");
+        String icon = "o"+object.getString("icon");
+
+        locationViewModel.setTemp(temp);
+        locationViewModel.setWeather(description);
+        locationViewModel.setPressure(press);
+        locationViewModel.setIcon(icon);
+
+        windViewModel.setWindForce(wind_speed);
+        windViewModel.setWindDirection(wind_deg);
+        windViewModel.setHumidity(hum);
+        windViewModel.setVisibility(visibility);
+
+        if(isTablet){
+            FragmentTransaction ft = fm.beginTransaction();
+
+            moonInfoFragment = MoonInfoFragment.newInstance();
+            ft.replace(R.id.fragment_container, moonInfoFragment);
+
+            sunInfoFragment = SunInfoFragment.newInstance();
+            ft.replace(R.id.fragment_container2, sunInfoFragment);
+            ft.commit();
+        } else {
+            vp.getAdapter().notifyDataSetChanged();
+        }
+    }
+
+    private void writeToFile(String filename, String data) {
+        try {
+            OutputStreamWriter outputStreamWriter = new OutputStreamWriter(openFileOutput(filename, Context.MODE_PRIVATE));
+            outputStreamWriter.write(data);
+            outputStreamWriter.close();
+        }
+        catch (IOException e) {
+            Log.e("Exception", "File write failed: " + e.toString());
+        }
+    }
+
+
+    private String readFromFile(String filename) {
+
+        String ret = "";
+
+        try {
+            InputStream inputStream = getApplicationContext().openFileInput(filename);
+
+            if ( inputStream != null ) {
+                InputStreamReader inputStreamReader = new InputStreamReader(inputStream);
+                BufferedReader bufferedReader = new BufferedReader(inputStreamReader);
+                String receiveString = "";
+                StringBuilder stringBuilder = new StringBuilder();
+
+                while ( (receiveString = bufferedReader.readLine()) != null ) {
+                    stringBuilder.append(receiveString);
+                }
+
+                inputStream.close();
+                ret = stringBuilder.toString();
+            }
+        }
+        catch (FileNotFoundException e) {
+            Toast.makeText(getApplicationContext(), "No data to show. Turn on internet connection.", Toast.LENGTH_SHORT).show();
+            Log.e("login activity", "File not found: " + e.toString());
+        } catch (IOException e) {
+            Log.e("login activity", "Can not read file: " + e.toString());
+        }
+
+        return ret;
+    }
+
 
 }

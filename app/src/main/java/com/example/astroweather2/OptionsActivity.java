@@ -9,6 +9,7 @@ import android.text.TextUtils;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.Spinner;
 import android.widget.Toast;
 
 import java.math.BigDecimal;
@@ -24,8 +25,7 @@ public class OptionsActivity extends AppCompatActivity {
     private final String PREF_UNITS_FIELD = "unitsField";
 
     private SharedPreferences preferences;
-    private EditText latitudeEdit;
-    private EditText longitudeEdit;
+    private Spinner spinner1;
     private EditText frequencyEdit;
     private Button okBtn;
 
@@ -34,13 +34,10 @@ public class OptionsActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_options);
 
-        latitudeEdit = findViewById(R.id.latitudeEdit);
-        longitudeEdit = findViewById(R.id.longitudeEdit);
+        spinner1 = findViewById(R.id.spinner1);
         frequencyEdit = findViewById(R.id.frequencyEdit);
 
         preferences = getSharedPreferences(PREF_FILE_NAME, Activity.MODE_PRIVATE);
-        latitudeEdit.setText(preferences.getString(PREF_LATITUDE_FIELD, ""));
-        longitudeEdit.setText(preferences.getString(PREF_LONGITUDE_FIELD, ""));
         frequencyEdit.setText(preferences.getString(PREF_FREQUENCY_FIELD, ""));
 
         okBtn = findViewById(R.id.okBtn);
@@ -49,8 +46,8 @@ public class OptionsActivity extends AppCompatActivity {
             public void onClick(View v) {
                 if(isEverythingValid()){
                     SharedPreferences.Editor preferencesEditor = preferences.edit();
-                    preferencesEditor.putString(PREF_LATITUDE_FIELD, latitudeEdit.getText().toString());
-                    preferencesEditor.putString(PREF_LONGITUDE_FIELD, longitudeEdit.getText().toString());
+                    preferencesEditor.putString(PREF_UNITS_FIELD, spinner1.getSelectedItem().toString());
+//                    preferencesEditor.putString(PREF_LONGITUDE_FIELD, longitudeEdit.getText().toString());
                     preferencesEditor.putString(PREF_FREQUENCY_FIELD, frequencyEdit.getText().toString());
                     preferencesEditor.commit();
 
@@ -63,24 +60,23 @@ public class OptionsActivity extends AppCompatActivity {
     }
 
     private boolean isEverythingValid(){
-        String latitude = latitudeEdit.getText().toString();
-        String longitude = longitudeEdit.getText().toString();
+//        String longitude = longitudeEdit.getText().toString();
         String freq = frequencyEdit.getText().toString();
-
-        if(TextUtils.isEmpty(latitude) || TextUtils.isEmpty(longitude) || TextUtils.isEmpty(freq)){
-            Toast.makeText(this, "All fields must be filled", Toast.LENGTH_SHORT).show();
-            return false;
-        }
-        BigDecimal latitudeBD = new BigDecimal(latitude);
-        if(latitudeBD.compareTo(BigDecimal.valueOf(90))==1 || latitudeBD.compareTo(BigDecimal.valueOf(-90))==-1){
-            Toast.makeText(this, "Latitude value must be between -90 and 90.", Toast.LENGTH_SHORT).show();
-            return false;
-        }
-        BigDecimal longitudeBD = new BigDecimal(longitude);
-        if(longitudeBD.compareTo(BigDecimal.valueOf(180))==1 || longitudeBD.compareTo(BigDecimal.valueOf(-180))==-1){
-            Toast.makeText(this, "Longitude value must be between -180 and 180.", Toast.LENGTH_SHORT).show();
-            return false;
-        }
+//
+//        if(TextUtils.isEmpty(latitude) || TextUtils.isEmpty(longitude) || TextUtils.isEmpty(freq)){
+//            Toast.makeText(this, "All fields must be filled", Toast.LENGTH_SHORT).show();
+//            return false;
+//        }
+//        BigDecimal latitudeBD = new BigDecimal(latitude);
+//        if(latitudeBD.compareTo(BigDecimal.valueOf(90))==1 || latitudeBD.compareTo(BigDecimal.valueOf(-90))==-1){
+//            Toast.makeText(this, "Latitude value must be between -90 and 90.", Toast.LENGTH_SHORT).show();
+//            return false;
+//        }
+//        BigDecimal longitudeBD = new BigDecimal(longitude);
+//        if(longitudeBD.compareTo(BigDecimal.valueOf(180))==1 || longitudeBD.compareTo(BigDecimal.valueOf(-180))==-1){
+//            Toast.makeText(this, "Longitude value must be between -180 and 180.", Toast.LENGTH_SHORT).show();
+//            return false;
+//        }
         if(Integer.valueOf(freq)==0){
             Toast.makeText(this, "Frequency value must be bigger than 0 [s].", Toast.LENGTH_SHORT).show();
             return false;

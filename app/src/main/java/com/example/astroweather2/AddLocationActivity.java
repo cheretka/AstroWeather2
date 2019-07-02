@@ -71,12 +71,13 @@ public class AddLocationActivity extends AppCompatActivity implements OnClickLis
         final String name = cityNameEditText.getText().toString();
 
         findCity(name);
+    }
 
+    @Override
+    public void onBackPressed() {
         Intent intent = new Intent(getApplicationContext(), MainActivity.class).setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
         startActivity(intent);
         finish();
-
-
     }
 
     public void findCity(String name)
@@ -108,6 +109,11 @@ public class AddLocationActivity extends AppCompatActivity implements OnClickLis
                     preferencesEditor.putString(PREF_LATITUDE_FIELD, cityLati);
                     preferencesEditor.putString(PREF_LONGITUDE_FIELD, cityLongi);
                     preferencesEditor.commit();
+
+
+                    Intent intent = new Intent(getApplicationContext(), MainActivity.class);
+                    startActivity(intent);
+                    finish();
 
                 }catch(JSONException e)
                 {

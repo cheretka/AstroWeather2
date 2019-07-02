@@ -5,26 +5,15 @@
     android:layout_height="match_parent"
     android:orientation="vertical">
 
-    <TextView
-        android:id="@+id/latitudeLabel"
+    <Spinner
+        android:id="@+id/spinner1"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_weight="1"
-        android:padding="0sp"
-        android:text="Latitude : "
         android:textAlignment="center"
-        android:textAppearance="@style/TextAppearance.AppCompat.Large" />
-
-    <EditText
-        android:id="@+id/latitudeEdit"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_weight="1"
-        android:inputType="numberDecimal|numberSigned"
-        android:maxLength="8"
-        android:padding="0sp"
-        android:textAlignment="center"
-        android:textAppearance="@style/TextAppearance.AppCompat.Large" />
+        android:textAppearance="@style/TextAppearance.AppCompat.Large"
+        android:entries="@array/units_array"
+        android:prompt="@string/units_prompt" />
 
     <TextView
         android:id="@+id/longitudeLabel"
@@ -53,7 +42,7 @@
         android:layout_height="wrap_content"
         android:layout_weight="1"
         android:padding="0sp"
-        android:text="Refresh frequency [s] :"
+        android:text="@string/sun_and_moon_refresh_frequency_s"
         android:textAlignment="center"
         android:textAppearance="@style/TextAppearance.AppCompat.Large" />
 

@@ -31,7 +31,7 @@
     <string name="humidity">Humidity :</string>
     <string name="visibility">Visibility :</string>
     <string name="city">City :</string>
-    <string name="add">Add</string>
+    <string name="add">Add and choose</string>
     <string name="question">Do you want to choose that location?</string>
     <string name="yes">Yes</string>
     <string name="cancel">Cancel</string>
@@ -39,4 +39,12 @@
     <string name="change_city">Change city</string>
     <string name="location_list_activity_name">Locations List</string>
     <string name="add_location_activity_name">Add Location</string>
+    <string name="units_prompt">Choose units</string>
+    <string name="sun_and_moon_refresh_frequency_s">Sun and moon refresh frequency [s] :</string>
+    <string name="refresh_weather">Refresh weather</string>
+    <string-array name="units_array">
+        <item>Default</item>
+        <item>Metric</item>
+        <item>Imperial</item>
+    </string-array>
 </resources>
