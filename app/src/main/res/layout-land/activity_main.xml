@@ -18,7 +18,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginTop="5sp"
-            android:text="current time"
+            android:text="@string/blank"
             android:textSize="@dimen/text_size"
             app:layout_constraintBottom_toTopOf="@+id/latitudeLabel"
             app:layout_constraintEnd_toEndOf="parent"
@@ -32,8 +32,9 @@
             android:layout_height="wrap_content"
             android:text="@string/latitude"
             android:textSize="@dimen/text_size"
-            app:layout_constraintBottom_toTopOf="@+id/latitudeText"
+            app:layout_constraintBottom_toTopOf="@+id/longitudeLabel"
             app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintEnd_toStartOf="@+id/latitudeText"
             app:layout_constraintHorizontal_bias="0.5"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/timeText" />
@@ -44,11 +45,12 @@
             android:layout_height="wrap_content"
             android:text="@string/longitude"
             android:textSize="@dimen/text_size"
-            app:layout_constraintBottom_toTopOf="@+id/longitudeText"
+            app:layout_constraintBottom_toTopOf="@+id/cityLabel"
             app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintEnd_toStartOf="@+id/longitudeText"
             app:layout_constraintHorizontal_bias="0.5"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/latitudeText" />
+            app:layout_constraintTop_toBottomOf="@+id/latitudeLabel" />
 
         <TextView
             android:id="@+id/latitudeText"
@@ -56,23 +58,25 @@
             android:layout_height="wrap_content"
             android:text="@string/blank"
             android:textSize="@dimen/text_size"
-            app:layout_constraintBottom_toTopOf="@+id/longitudeLabel"
+            app:layout_constraintBottom_toBottomOf="@+id/latitudeLabel"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintHorizontal_bias="0.5"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/latitudeLabel" />
+            app:layout_constraintStart_toEndOf="@+id/latitudeLabel"
+            app:layout_constraintTop_toBottomOf="@+id/timeText"
+            app:layout_constraintTop_toTopOf="@+id/latitudeLabel" />
 
         <TextView
             android:id="@+id/longitudeText"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:layout_marginStart="8dp"
             android:text="@string/blank"
             android:textSize="@dimen/text_size"
-            app:layout_constraintBottom_toTopOf="@+id/cityLabel"
+            app:layout_constraintBottom_toBottomOf="@+id/longitudeLabel"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintHorizontal_bias="0.5"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/longitudeLabel" />
+            app:layout_constraintStart_toEndOf="@+id/longitudeLabel"
+            app:layout_constraintTop_toTopOf="@+id/longitudeLabel" />
 
         <TextView
             android:id="@+id/cityLabel"
@@ -82,11 +86,12 @@
             android:layout_marginEnd="5dp"
             android:text="@string/city"
             android:textSize="@dimen/text_size"
-            app:layout_constraintBottom_toTopOf="@+id/cityText"
+            app:layout_constraintBottom_toTopOf="@+id/optionsButton"
             app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintEnd_toStartOf="@+id/cityText"
             app:layout_constraintHorizontal_bias="0.5"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/longitudeText" />
+            app:layout_constraintTop_toBottomOf="@+id/longitudeLabel" />
 
         <TextView
             android:id="@+id/cityText"
@@ -97,8 +102,8 @@
             app:layout_constraintBottom_toTopOf="@+id/optionsButton"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintHorizontal_bias="0.5"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/cityLabel" />
+            app:layout_constraintStart_toEndOf="@+id/cityLabel"
+            app:layout_constraintTop_toBottomOf="@+id/longitudeText" />
 
         <Button
             android:id="@+id/optionsButton"
@@ -122,12 +127,25 @@
             android:text="@string/change_city"
             android:textAppearance="@style/TextAppearance.AppCompat.Small"
             android:textSize="@dimen/text_size"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toEndOf="@+id/optionsButton"
+            app:layout_constraintBottom_toTopOf="@+id/refreshBtn"
+            app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintHorizontal_bias="0.5"
-            app:layout_constraintStart_toStartOf="@+id/optionsButton"
+            app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/optionsButton"
             app:layout_constraintVertical_bias="0.0" />
+
+        <Button
+            android:id="@+id/refreshBtn"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/refresh_weather"
+            android:textAppearance="@style/TextAppearance.AppCompat.Small"
+            android:textSize="@dimen/text_size"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="0.5"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/changeCityBtn" />
     </android.support.constraint.ConstraintLayout>
 
     <android.support.v4.view.ViewPager

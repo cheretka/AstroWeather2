@@ -41,9 +41,12 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
+import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
+
+import static java.util.Calendar.*;
 
 public class MainActivity extends AppCompatActivity {
     private final String PREF_FILE_NAME = "astroPreferences";
@@ -53,10 +56,13 @@ public class MainActivity extends AppCompatActivity {
     private final String PREF_CITY_NAME_FIELD = "cityNameField";
     private final String PREF_CITY_ID_FIELD = "cityIdField";
     private final String PREF_UNITS_FIELD = "unitsField";
+    private final String PREF_LAST_SAVED_DATE = "lastSavedDate";
     private SharedPreferences preferences;
 
     private final String WEATHER_JSON_FILE_NAME = "weather.json";
     private final String FORECAST_JSON_FILE_NAME = "forecast";
+
+    private final int SECONDS_BETWEEN_REFRESH = 20;
 
     private SimpleDateFormat simpleDateTimeFormat = new SimpleDateFormat("yyyy.MM.dd\nHH:mm:ss z");
     private SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy.MM.dd");
@@ -156,7 +162,7 @@ public class MainActivity extends AppCompatActivity {
         refreshBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                updateWeatherData();
+                updateWeatherAndForecastData(true);
             }
         });
 
@@ -183,11 +189,11 @@ public class MainActivity extends AppCompatActivity {
 
                     double lati = Double.valueOf(latitude);
                     double longi = Double.valueOf(longitude);
-                    Calendar c = Calendar.getInstance();
+                    Calendar c = getInstance();
 
-                    AstroDateTime astroDateTime = new AstroDateTime(c.get(Calendar.YEAR), c.get(Calendar.MONTH)+1,
-                            c.get(Calendar.DAY_OF_MONTH), c.get(Calendar.HOUR_OF_DAY), c.get(Calendar.MINUTE),
-                            c.get(Calendar.SECOND),c.get(Calendar.ZONE_OFFSET)/3600_000,true);
+                    AstroDateTime astroDateTime = new AstroDateTime(c.get(YEAR), c.get(MONTH)+1,
+                            c.get(DAY_OF_MONTH), c.get(HOUR_OF_DAY), c.get(MINUTE),
+                            c.get(SECOND),c.get(ZONE_OFFSET)/3600_000,true);
                     AstroCalculator astroCalculator = new AstroCalculator(astroDateTime, new AstroCalculator.Location(lati, longi));
 
                     AstroCalculator.MoonInfo moonInfo = astroCalculator.getMoonInfo();
@@ -211,25 +217,60 @@ public class MainActivity extends AppCompatActivity {
             }
         };
 
-        updateWeatherData();
+        updateWeatherAndForecastData(false);
     }
 
-    private void updateWeatherData() {
-        if(isConnectedToNetwork(getApplicationContext())){
-            String id = preferences.getString(PREF_CITY_ID_FIELD, "");
-            units = preferences.getString(PREF_UNITS_FIELD,"default");
+    private void updateWeatherAndForecastData(boolean changedUnits) {
 
-            if(!id.isEmpty()){
-                findWeather(id, units);
-            }
-        } else {
-            Toast.makeText(getApplicationContext(), "No network connection. \nWeather data may be outdated.", Toast.LENGTH_LONG).show();
+        if(!isPastEstablishedNoRefreshTime() && !changedUnits){
             try {
-                getWeatherFromFile();
+                Toast.makeText(getApplicationContext(), "from file", Toast.LENGTH_SHORT).show();
+                getWeatherAndForecastFromFile();
             } catch (JSONException e) {
                 e.printStackTrace();
             }
+        } else {
+            if (!isConnectedToNetwork(getApplicationContext())) {
+                Toast.makeText(getApplicationContext(), "No network connection. \nWeather data may be outdated.", Toast.LENGTH_SHORT).show();
+                try {
+                    getWeatherAndForecastFromFile();
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
+            } else {
+                String id = preferences.getString(PREF_CITY_ID_FIELD, "");
+                units = preferences.getString(PREF_UNITS_FIELD,"default");
+
+                if(!id.isEmpty()){
+                    findWeather(id, units);
+                    Toast.makeText(getApplicationContext(), "from api", Toast.LENGTH_SHORT).show();
+                }
+            }
         }
+    }
+
+
+    private boolean isPastEstablishedNoRefreshTime() {
+        String savedDateString = preferences.getString(PREF_LAST_SAVED_DATE, "");
+        if(!savedDateString.isEmpty()) {
+//            Toast.makeText(getApplicationContext(), "saved :" + savedDateString, Toast.LENGTH_LONG).show();
+            Date date = null;
+            try {
+                date = simpleDateTimeFormat.parse(savedDateString);
+            } catch (ParseException e) {
+                e.printStackTrace();
+            }
+            Calendar c = Calendar.getInstance();
+            c.setTime(date);
+            c.add(SECOND, SECONDS_BETWEEN_REFRESH);
+            if (c.before(Calendar.getInstance())) {
+//                Toast.makeText(getApplicationContext(), "20 sec passed", Toast.LENGTH_LONG).show();
+                return true;
+            } else{
+                return false;
+            }
+        }
+        return true;
     }
 
     @Override
@@ -251,11 +292,11 @@ public class MainActivity extends AppCompatActivity {
 
                         double lati = Double.valueOf(latitude);
                         double longi = Double.valueOf(longitude);
-                        Calendar c = Calendar.getInstance();
+                        Calendar c = getInstance();
 
-                        AstroDateTime astroDateTime = new AstroDateTime(c.get(Calendar.YEAR), c.get(Calendar.MONTH)+1,
-                                c.get(Calendar.DAY_OF_MONTH), c.get(Calendar.HOUR_OF_DAY), c.get(Calendar.MINUTE),
-                                c.get(Calendar.SECOND),c.get(Calendar.ZONE_OFFSET)/3600_000,true);
+                        AstroDateTime astroDateTime = new AstroDateTime(c.get(YEAR), c.get(MONTH)+1,
+                                c.get(DAY_OF_MONTH), c.get(HOUR_OF_DAY), c.get(MINUTE),
+                                c.get(SECOND),c.get(ZONE_OFFSET)/3600_000,true);
                         AstroCalculator astroCalculator = new AstroCalculator(astroDateTime, new AstroCalculator.Location(lati, longi));
 
                         AstroCalculator.MoonInfo moonInfo = astroCalculator.getMoonInfo();
@@ -278,7 +319,7 @@ public class MainActivity extends AppCompatActivity {
                     }
                 }
             };
-            updateWeatherData();
+            updateWeatherAndForecastData(true);
         }
     }
 
@@ -325,6 +366,11 @@ public class MainActivity extends AppCompatActivity {
             public void onResponse(JSONObject response) {
                 try
                 {
+                    String currentDate = simpleDateTimeFormat.format(new Date());
+                    SharedPreferences.Editor preferencesEditor = preferences.edit();
+                    preferencesEditor.putString(PREF_LAST_SAVED_DATE, currentDate);
+                    preferencesEditor.commit();
+
                     writeToFile(WEATHER_JSON_FILE_NAME, response.toString());
                     updateWeatherFromJsonObject(response);
 
@@ -375,7 +421,7 @@ public class MainActivity extends AppCompatActivity {
 
     }
 
-    private void getWeatherFromFile() throws JSONException {
+    private void getWeatherAndForecastFromFile() throws JSONException {
         String s = readFromFile(WEATHER_JSON_FILE_NAME);
         JSONObject weather = new JSONObject(s);
         updateWeatherFromJsonObject(weather);
@@ -386,7 +432,7 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void updateForecastFromJsonObject(JSONObject response) throws JSONException {
-        Calendar c = Calendar.getInstance();
+        Calendar c = getInstance();
         JSONArray array = response.getJSONArray("list");
 
         JSONObject object = array.getJSONObject(8);
@@ -396,7 +442,7 @@ public class MainActivity extends AppCompatActivity {
         JSONObject weather_object = weather_array.getJSONObject(0);
         String description = weather_object.getString("description");
         String icon = "o"+weather_object.getString("icon");
-        c.add(Calendar.DAY_OF_MONTH,1);
+        c.add(DAY_OF_MONTH,1);
 
         forecastViewModel.setDate1(simpleDateFormat.format(c.getTime()));
         forecastViewModel.setDate1Temp(temp);
@@ -410,7 +456,7 @@ public class MainActivity extends AppCompatActivity {
         weather_object = weather_array.getJSONObject(0);
         description = weather_object.getString("description");
         icon = "o"+weather_object.getString("icon");
-        c.add(Calendar.DAY_OF_MONTH,1);
+        c.add(DAY_OF_MONTH,1);
 
         forecastViewModel.setDate2(simpleDateFormat.format(c.getTime()));
         forecastViewModel.setDate2Temp(temp);
@@ -424,7 +470,7 @@ public class MainActivity extends AppCompatActivity {
         weather_object = weather_array.getJSONObject(0);
         description = weather_object.getString("description");
         icon = "o"+weather_object.getString("icon");
-        c.add(Calendar.DAY_OF_MONTH,1);
+        c.add(DAY_OF_MONTH,1);
 
         forecastViewModel.setDate3(simpleDateFormat.format(c.getTime()));
         forecastViewModel.setDate3Temp(temp);
@@ -438,7 +484,7 @@ public class MainActivity extends AppCompatActivity {
         weather_object = weather_array.getJSONObject(0);
         description = weather_object.getString("description");
         icon = "o"+weather_object.getString("icon");
-        c.add(Calendar.DAY_OF_MONTH,1);
+        c.add(DAY_OF_MONTH,1);
 
         forecastViewModel.setDate4(simpleDateFormat.format(c.getTime()));
         forecastViewModel.setDate4Temp(temp);
@@ -459,7 +505,9 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
+
     private void updateWeatherFromJsonObject(JSONObject response) throws JSONException {
+
         JSONObject main_object = response.getJSONObject("main");
         JSONObject wind_object = response.getJSONObject("wind");
         JSONArray array = response.getJSONArray("weather");

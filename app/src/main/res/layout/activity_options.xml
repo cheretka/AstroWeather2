@@ -9,30 +9,9 @@
         android:id="@+id/spinner1"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_weight="1"
-        android:textAlignment="center"
-        android:textAppearance="@style/TextAppearance.AppCompat.Large"
+        android:layout_weight="2"
         android:entries="@array/units_array"
-        android:prompt="@string/units_prompt" />
-
-    <TextView
-        android:id="@+id/longitudeLabel"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_weight="1"
-        android:padding="0sp"
-        android:text="Longitude :"
-        android:textAlignment="center"
-        android:textAppearance="@style/TextAppearance.AppCompat.Large" />
-
-    <EditText
-        android:id="@+id/longitudeEdit"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_weight="1"
-        android:inputType="numberDecimal|numberSigned"
-        android:maxLength="8"
-        android:padding="0sp"
+        android:prompt="@string/units_prompt"
         android:textAlignment="center"
         android:textAppearance="@style/TextAppearance.AppCompat.Large" />
 
@@ -54,6 +33,7 @@
         android:inputType="number"
         android:maxLength="4"
         android:padding="0sp"
+        android:text="5"
         android:textAlignment="center"
         android:textAppearance="@style/TextAppearance.AppCompat.Large" />
 
