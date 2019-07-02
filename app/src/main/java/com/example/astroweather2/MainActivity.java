@@ -57,18 +57,23 @@ public class MainActivity extends AppCompatActivity {
     private final String PREF_CITY_ID_FIELD = "cityIdField";
     private final String PREF_UNITS_FIELD = "unitsField";
     private final String PREF_LAST_SAVED_DATE = "lastSavedDate";
+    private final String PREF_CHANGED = "changed";
     private SharedPreferences preferences;
 
     private final String WEATHER_JSON_FILE_NAME = "weather.json";
-    private final String FORECAST_JSON_FILE_NAME = "forecast";
+    private final String FORECAST_JSON_FILE_NAME = "forecast.json";
 
     private final int SECONDS_BETWEEN_REFRESH = 20;
 
     private SimpleDateFormat simpleDateTimeFormat = new SimpleDateFormat("yyyy.MM.dd\nHH:mm:ss z");
     private SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy.MM.dd");
     private FragmentPagerAdapter fragmentPagerAdapter;
+    private FragmentPagerAdapter weatherFragmentPagerAdapter;
+    private FragmentPagerAdapter sunMoonFragmentPagerAdapter;
     private final FragmentManager fm = getSupportFragmentManager();
     private ViewPager vp;
+    private ViewPager vpWeather;
+    private ViewPager vpSunMoon;
     private Fragment moonInfoFragment;
     private Fragment sunInfoFragment;
     private Fragment locationFragment;
@@ -87,6 +92,7 @@ public class MainActivity extends AppCompatActivity {
 
     private String frequency;
     private String units;
+    private boolean changed;
 
     private Button optionsBtn;
     private Button changeCityBtn;
@@ -112,14 +118,21 @@ public class MainActivity extends AppCompatActivity {
         isTablet = getResources().getBoolean(R.bool.isTablet);
 
         if(isTablet){
-            FragmentTransaction ft = this.fm.beginTransaction();
+//            FragmentTransaction ft = this.fm.beginTransaction();
+//
+//            moonInfoFragment = MoonInfoFragment.newInstance();
+//            ft.replace(R.id.fragment_container, moonInfoFragment);
+//
+//            sunInfoFragment = SunInfoFragment.newInstance();
+//            ft.replace(R.id.fragment_container2, sunInfoFragment);
+//            ft.commit();
+            vpWeather = findViewById(R.id.vpWeather);
+            weatherFragmentPagerAdapter = new WeatherViewPager(getSupportFragmentManager());
+            vpWeather.setAdapter(weatherFragmentPagerAdapter);
 
-            moonInfoFragment = MoonInfoFragment.newInstance();
-            ft.replace(R.id.fragment_container, moonInfoFragment);
-
-            sunInfoFragment = SunInfoFragment.newInstance();
-            ft.replace(R.id.fragment_container2, sunInfoFragment);
-            ft.commit();
+            vpSunMoon = findViewById(R.id.vpSunMoon);
+            sunMoonFragmentPagerAdapter = new SunMoonViewPager(getSupportFragmentManager());
+            vpSunMoon.setAdapter(sunMoonFragmentPagerAdapter);
         } else {
             vp = findViewById(R.id.vp);
             fragmentPagerAdapter = new InfoViewPager(getSupportFragmentManager());
@@ -154,7 +167,7 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 Intent intent = new Intent(getApplicationContext(), LocationListActivity.class);
-                startActivity(intent);
+                startActivityForResult(intent,2);
             }
         });
 
@@ -201,14 +214,16 @@ public class MainActivity extends AppCompatActivity {
                     moonViewModel.setMoonInfo(moonInfo);
                     sunViewModel.setSunInfo(sunInfo);
                     if(isTablet){
-                        FragmentTransaction ft = fm.beginTransaction();
-
-                        moonInfoFragment = MoonInfoFragment.newInstance();
-                        ft.replace(R.id.fragment_container, moonInfoFragment);
-
-                        sunInfoFragment = SunInfoFragment.newInstance();
-                        ft.replace(R.id.fragment_container2, sunInfoFragment);
-                        ft.commit();
+//                        FragmentTransaction ft = fm.beginTransaction();
+//
+//                        moonInfoFragment = MoonInfoFragment.newInstance();
+//                        ft.replace(R.id.fragment_container, moonInfoFragment);
+//
+//                        sunInfoFragment = SunInfoFragment.newInstance();
+//                        ft.replace(R.id.fragment_container2, sunInfoFragment);
+//                        ft.commit();
+                        vpWeather.getAdapter().notifyDataSetChanged();
+                        vpSunMoon.getAdapter().notifyDataSetChanged();
                     } else {
                         vp.getAdapter().notifyDataSetChanged();
                     }
@@ -217,7 +232,14 @@ public class MainActivity extends AppCompatActivity {
             }
         };
 
-        updateWeatherAndForecastData(false);
+        changed = preferences.getBoolean(PREF_CHANGED, false);
+        updateWeatherAndForecastData(changed);
+        if(changed){
+            SharedPreferences.Editor preferencesEditor = preferences.edit();
+            preferencesEditor.putBoolean(PREF_CHANGED, false);
+            preferencesEditor.commit();
+        }
+
     }
 
     private void updateWeatherAndForecastData(boolean changedUnits) {
@@ -304,14 +326,16 @@ public class MainActivity extends AppCompatActivity {
                         moonViewModel.setMoonInfo(moonInfo);
                         sunViewModel.setSunInfo(sunInfo);
                         if(isTablet){
-                            FragmentTransaction ft = fm.beginTransaction();
-
-                            moonInfoFragment = MoonInfoFragment.newInstance();
-                            ft.replace(R.id.fragment_container, moonInfoFragment);
-
-                            sunInfoFragment = SunInfoFragment.newInstance();
-                            ft.replace(R.id.fragment_container2, sunInfoFragment);
-                            ft.commit();
+//                            FragmentTransaction ft = fm.beginTransaction();
+//
+//                            moonInfoFragment = MoonInfoFragment.newInstance();
+//                            ft.replace(R.id.fragment_container, moonInfoFragment);
+//
+//                            sunInfoFragment = SunInfoFragment.newInstance();
+//                            ft.replace(R.id.fragment_container2, sunInfoFragment);
+//                            ft.commit();
+                            vpWeather.getAdapter().notifyDataSetChanged();
+                            vpSunMoon.getAdapter().notifyDataSetChanged();
                         } else {
                             vp.getAdapter().notifyDataSetChanged();
                         }
@@ -319,6 +343,11 @@ public class MainActivity extends AppCompatActivity {
                     }
                 }
             };
+            updateWeatherAndForecastData(true);
+        } else if (requestCode == 2 && resultCode == Activity.RESULT_OK) {
+            latitudeTextView.setText(preferences.getString(PREF_LATITUDE_FIELD, ""));
+            longitudeTextView.setText(preferences.getString(PREF_LONGITUDE_FIELD, ""));
+            cityTextView.setText(preferences.getString(PREF_CITY_NAME_FIELD,""));
             updateWeatherAndForecastData(true);
         }
     }
@@ -426,9 +455,9 @@ public class MainActivity extends AppCompatActivity {
         JSONObject weather = new JSONObject(s);
         updateWeatherFromJsonObject(weather);
 
-        s = readFromFile(FORECAST_JSON_FILE_NAME);
-        JSONObject forecast = new JSONObject(s);
-        updateWeatherFromJsonObject(forecast);
+        String f = readFromFile(FORECAST_JSON_FILE_NAME);
+        JSONObject forecast = new JSONObject(f);
+        updateForecastFromJsonObject(forecast);
     }
 
     private void updateForecastFromJsonObject(JSONObject response) throws JSONException {
@@ -477,7 +506,7 @@ public class MainActivity extends AppCompatActivity {
         forecastViewModel.setDate3Desc(description);
         forecastViewModel.setDate3Image(icon);
 
-        object = array.getJSONObject(32);
+        object = array.getJSONObject(34);
         main_object = object.getJSONObject("main");
         temp = String.valueOf(main_object.getDouble("temp"));
         weather_array = object.getJSONArray("weather");
@@ -492,14 +521,16 @@ public class MainActivity extends AppCompatActivity {
         forecastViewModel.setDate4Image(icon);
 
         if(isTablet){
-            FragmentTransaction ft = fm.beginTransaction();
-
-            moonInfoFragment = MoonInfoFragment.newInstance();
-            ft.replace(R.id.fragment_container, moonInfoFragment);
-
-            sunInfoFragment = SunInfoFragment.newInstance();
-            ft.replace(R.id.fragment_container2, sunInfoFragment);
-            ft.commit();
+//            FragmentTransaction ft = fm.beginTransaction();
+//
+//            moonInfoFragment = MoonInfoFragment.newInstance();
+//            ft.replace(R.id.fragment_container, moonInfoFragment);
+//
+//            sunInfoFragment = SunInfoFragment.newInstance();
+//            ft.replace(R.id.fragment_container2, sunInfoFragment);
+//            ft.commit();
+            vpWeather.getAdapter().notifyDataSetChanged();
+            vpSunMoon.getAdapter().notifyDataSetChanged();
         } else {
             vp.getAdapter().notifyDataSetChanged();
         }
@@ -534,14 +565,16 @@ public class MainActivity extends AppCompatActivity {
         windViewModel.setVisibility(visibility);
 
         if(isTablet){
-            FragmentTransaction ft = fm.beginTransaction();
-
-            moonInfoFragment = MoonInfoFragment.newInstance();
-            ft.replace(R.id.fragment_container, moonInfoFragment);
-
-            sunInfoFragment = SunInfoFragment.newInstance();
-            ft.replace(R.id.fragment_container2, sunInfoFragment);
-            ft.commit();
+//            FragmentTransaction ft = fm.beginTransaction();
+//
+//            moonInfoFragment = MoonInfoFragment.newInstance();
+//            ft.replace(R.id.fragment_container, moonInfoFragment);
+//
+//            sunInfoFragment = SunInfoFragment.newInstance();
+//            ft.replace(R.id.fragment_container2, sunInfoFragment);
+//            ft.commit();
+            vpWeather.getAdapter().notifyDataSetChanged();
+            vpSunMoon.getAdapter().notifyDataSetChanged();
         } else {
             vp.getAdapter().notifyDataSetChanged();
         }

@@ -45,6 +45,7 @@ public class AddLocationActivity extends AppCompatActivity implements OnClickLis
     private final String PREF_CITY_NAME_FIELD = "cityNameField";
     private final String PREF_CITY_ID_FIELD = "cityIdField";
     private final String PREF_UNITS_FIELD = "unitsField";
+    private final String PREF_CHANGED = "changed";
 
 
     private DBManager dbManager;
@@ -70,7 +71,12 @@ public class AddLocationActivity extends AppCompatActivity implements OnClickLis
 
         final String name = cityNameEditText.getText().toString();
 
-        findCity(name);
+        if(MainActivity.isConnectedToNetwork(getApplicationContext())){
+            findCity(name);
+        } else {
+            Toast.makeText(getApplicationContext(), "No internet connection", Toast.LENGTH_SHORT).show();
+        }
+
     }
 
     @Override
@@ -108,6 +114,7 @@ public class AddLocationActivity extends AppCompatActivity implements OnClickLis
                     preferencesEditor.putString(PREF_CITY_NAME_FIELD, cityName);
                     preferencesEditor.putString(PREF_LATITUDE_FIELD, cityLati);
                     preferencesEditor.putString(PREF_LONGITUDE_FIELD, cityLongi);
+                    preferencesEditor.putBoolean(PREF_CHANGED, true);
                     preferencesEditor.commit();
 
 

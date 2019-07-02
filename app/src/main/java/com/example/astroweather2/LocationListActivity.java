@@ -105,19 +105,23 @@ public class LocationListActivity extends AppCompatActivity {
                 if(cityName == null || cityId == null || cityLati == null || cityLongi == null ){
                     Toast.makeText(getApplicationContext(), "No city selected", Toast.LENGTH_SHORT).show();
                 } else {
-
-                    SharedPreferences.Editor preferencesEditor = preferences.edit();
-                    preferencesEditor.putString(PREF_CITY_ID_FIELD, cityId);
-                    preferencesEditor.putString(PREF_CITY_NAME_FIELD, cityName);
-                    preferencesEditor.putString(PREF_LATITUDE_FIELD, cityLati);
-                    preferencesEditor.putString(PREF_LONGITUDE_FIELD, cityLongi);
-                    preferencesEditor.commit();
+                    if(MainActivity.isConnectedToNetwork(getApplicationContext())){
+                        SharedPreferences.Editor preferencesEditor = preferences.edit();
+                        preferencesEditor.putString(PREF_CITY_ID_FIELD, cityId);
+                        preferencesEditor.putString(PREF_CITY_NAME_FIELD, cityName);
+                        preferencesEditor.putString(PREF_LATITUDE_FIELD, cityLati);
+                        preferencesEditor.putString(PREF_LONGITUDE_FIELD, cityLongi);
+                        preferencesEditor.commit();
+                        Intent returnIntent = new Intent();
+                        setResult(Activity.RESULT_OK, returnIntent);
+                        finish();
+                    } else {
+                        Toast.makeText(getApplicationContext(), "No internet connection", Toast.LENGTH_SHORT).show();
+                    }
 
                 }
 
-                Intent intent = new Intent(getApplicationContext(), MainActivity.class).setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-                startActivity(intent);
-                finish();
+
             }
         });
     }
