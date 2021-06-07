@@ -9,14 +9,10 @@ import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.os.Bundle;
 import android.os.Handler;
-import android.support.v4.app.Fragment;
-import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentPagerAdapter;
-import android.support.v4.app.FragmentTransaction;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.AppCompatActivity;
 import android.text.TextUtils;
-import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
@@ -30,6 +26,11 @@ import com.android.volley.toolbox.JsonObjectRequest;
 import com.android.volley.toolbox.Volley;
 import com.astrocalculator.AstroCalculator;
 import com.astrocalculator.AstroDateTime;
+import com.example.astroweather2.viewmodels.ForecastViewModel;
+import com.example.astroweather2.viewmodels.LocationViewModel;
+import com.example.astroweather2.viewmodels.MoonViewModel;
+import com.example.astroweather2.viewmodels.SunViewModel;
+import com.example.astroweather2.viewmodels.WindViewModel;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -49,6 +50,7 @@ import java.util.Date;
 import static java.util.Calendar.*;
 
 public class MainActivity extends AppCompatActivity {
+
     private final String PREF_FILE_NAME = "astroPreferences";
     private final String PREF_LATITUDE_FIELD = "latitudeField";
     private final String PREF_LONGITUDE_FIELD = "longitudeField";
@@ -63,22 +65,11 @@ public class MainActivity extends AppCompatActivity {
     private final String WEATHER_JSON_FILE_NAME = "weather.json";
     private final String FORECAST_JSON_FILE_NAME = "forecast.json";
 
-    private final int SECONDS_BETWEEN_REFRESH = 20;
-
-    private SimpleDateFormat simpleDateTimeFormat = new SimpleDateFormat("yyyy.MM.dd\nHH:mm:ss z");
-    private SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy.MM.dd");
-    private FragmentPagerAdapter fragmentPagerAdapter;
-    private FragmentPagerAdapter weatherFragmentPagerAdapter;
-    private FragmentPagerAdapter sunMoonFragmentPagerAdapter;
-    private final FragmentManager fm = getSupportFragmentManager();
+    private final SimpleDateFormat simpleDateTimeFormat = new SimpleDateFormat("yyyy.MM.dd\nHH:mm:ss z");
+    private final SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy.MM.dd");
     private ViewPager vp;
     private ViewPager vpWeather;
     private ViewPager vpSunMoon;
-    private Fragment moonInfoFragment;
-    private Fragment sunInfoFragment;
-    private Fragment locationFragment;
-    private Fragment windFragment;
-    private Fragment forecastFragment;
     private boolean isTablet;
 
     private Handler handler;
@@ -92,11 +83,6 @@ public class MainActivity extends AppCompatActivity {
 
     private String frequency;
     private String units;
-    private boolean changed;
-
-    private Button optionsBtn;
-    private Button changeCityBtn;
-    private Button refreshBtn;
 
     private MoonViewModel moonViewModel;
     private SunViewModel sunViewModel;
@@ -105,6 +91,8 @@ public class MainActivity extends AppCompatActivity {
     private ForecastViewModel forecastViewModel;
 
     @Override
+
+
     protected void onCreate(final Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
@@ -118,24 +106,16 @@ public class MainActivity extends AppCompatActivity {
         isTablet = getResources().getBoolean(R.bool.isTablet);
 
         if(isTablet){
-//            FragmentTransaction ft = this.fm.beginTransaction();
-//
-//            moonInfoFragment = MoonInfoFragment.newInstance();
-//            ft.replace(R.id.fragment_container, moonInfoFragment);
-//
-//            sunInfoFragment = SunInfoFragment.newInstance();
-//            ft.replace(R.id.fragment_container2, sunInfoFragment);
-//            ft.commit();
             vpWeather = findViewById(R.id.vpWeather);
-            weatherFragmentPagerAdapter = new WeatherViewPager(getSupportFragmentManager());
+            FragmentPagerAdapter weatherFragmentPagerAdapter = new AdapterWeather(getSupportFragmentManager());
             vpWeather.setAdapter(weatherFragmentPagerAdapter);
 
             vpSunMoon = findViewById(R.id.vpSunMoon);
-            sunMoonFragmentPagerAdapter = new SunMoonViewPager(getSupportFragmentManager());
+            FragmentPagerAdapter sunMoonFragmentPagerAdapter = new AdapterSunMoon(getSupportFragmentManager());
             vpSunMoon.setAdapter(sunMoonFragmentPagerAdapter);
         } else {
             vp = findViewById(R.id.vp);
-            fragmentPagerAdapter = new InfoViewPager(getSupportFragmentManager());
+            FragmentPagerAdapter fragmentPagerAdapter = new AdapterInfo(getSupportFragmentManager());
             vp.setAdapter(fragmentPagerAdapter);
         }
 
@@ -153,7 +133,7 @@ public class MainActivity extends AppCompatActivity {
         frequency = preferences.getString(PREF_FREQUENCY_FIELD, "");
         units = preferences.getString(PREF_UNITS_FIELD, "default");
 
-        optionsBtn = findViewById(R.id.optionsButton);
+        Button optionsBtn = findViewById(R.id.optionsButton);
         optionsBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -162,7 +142,7 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
-        changeCityBtn = findViewById(R.id.changeCityBtn);
+        Button changeCityBtn = findViewById(R.id.changeCityBtn);
         changeCityBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -171,7 +151,7 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
-        refreshBtn = findViewById(R.id.refreshBtn);
+        Button refreshBtn = findViewById(R.id.refreshBtn);
         refreshBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -198,8 +178,6 @@ public class MainActivity extends AppCompatActivity {
                 String longitude = longitudeTextView.getText().toString();
 
                 if(!(TextUtils.isEmpty(latitude) || TextUtils.isEmpty(longitude) || TextUtils.isEmpty(frequency))){
-//                    Toast.makeText(getApplicationContext(), "sunAndMoonRunnable", Toast.LENGTH_SHORT).show();
-
                     double lati = Double.valueOf(latitude);
                     double longi = Double.valueOf(longitude);
                     Calendar c = getInstance();
@@ -214,14 +192,6 @@ public class MainActivity extends AppCompatActivity {
                     moonViewModel.setMoonInfo(moonInfo);
                     sunViewModel.setSunInfo(sunInfo);
                     if(isTablet){
-//                        FragmentTransaction ft = fm.beginTransaction();
-//
-//                        moonInfoFragment = MoonInfoFragment.newInstance();
-//                        ft.replace(R.id.fragment_container, moonInfoFragment);
-//
-//                        sunInfoFragment = SunInfoFragment.newInstance();
-//                        ft.replace(R.id.fragment_container2, sunInfoFragment);
-//                        ft.commit();
                         vpWeather.getAdapter().notifyDataSetChanged();
                         vpSunMoon.getAdapter().notifyDataSetChanged();
                     } else {
@@ -232,7 +202,7 @@ public class MainActivity extends AppCompatActivity {
             }
         };
 
-        changed = preferences.getBoolean(PREF_CHANGED, false);
+        boolean changed = preferences.getBoolean(PREF_CHANGED, false);
         updateWeatherAndForecastData(changed);
         if(changed){
             SharedPreferences.Editor preferencesEditor = preferences.edit();
@@ -242,40 +212,38 @@ public class MainActivity extends AppCompatActivity {
 
     }
 
-    private void updateWeatherAndForecastData(boolean changedUnits) {
+    private void updateWeatherAndForecastData(boolean newUnits) {
 
-        if(!isPastEstablishedNoRefreshTime() && !changedUnits){
+        if(!isTimeForUpdate() && !newUnits ){
             try {
-                Toast.makeText(getApplicationContext(), "from file", Toast.LENGTH_SHORT).show();
-                getWeatherAndForecastFromFile();
+                Toast.makeText(getApplicationContext(), "aktualne dane z pliku", Toast.LENGTH_SHORT).show();
+                getDataFromFile();
             } catch (JSONException e) {
-                e.printStackTrace();
+//                e.printStackTrace();
+            }
+        } else if (!isConnectedToNetwork(getApplicationContext())) {
+            Toast.makeText(getApplicationContext(), "dane mogą być nie aktualne", Toast.LENGTH_SHORT).show();
+            try {
+                getDataFromFile();
+            } catch (JSONException e) {
+//                e.printStackTrace();
             }
         } else {
-            if (!isConnectedToNetwork(getApplicationContext())) {
-                Toast.makeText(getApplicationContext(), "No network connection. \nWeather data may be outdated.", Toast.LENGTH_SHORT).show();
-                try {
-                    getWeatherAndForecastFromFile();
-                } catch (JSONException e) {
-                    e.printStackTrace();
-                }
-            } else {
-                String id = preferences.getString(PREF_CITY_ID_FIELD, "");
-                units = preferences.getString(PREF_UNITS_FIELD,"default");
+            String id = preferences.getString(PREF_CITY_ID_FIELD, "");
+            units = preferences.getString(PREF_UNITS_FIELD,"default");
 
-                if(!id.isEmpty()){
-                    findWeather(id, units);
-                    Toast.makeText(getApplicationContext(), "from api", Toast.LENGTH_SHORT).show();
-                }
+            if(!id.isEmpty()){
+                refreshment(id, units);
+                Toast.makeText(getApplicationContext(), "aktualne dane", Toast.LENGTH_SHORT).show();
             }
         }
+
     }
 
 
-    private boolean isPastEstablishedNoRefreshTime() {
+    private boolean isTimeForUpdate() {
         String savedDateString = preferences.getString(PREF_LAST_SAVED_DATE, "");
         if(!savedDateString.isEmpty()) {
-//            Toast.makeText(getApplicationContext(), "saved :" + savedDateString, Toast.LENGTH_LONG).show();
             Date date = null;
             try {
                 date = simpleDateTimeFormat.parse(savedDateString);
@@ -284,9 +252,9 @@ public class MainActivity extends AppCompatActivity {
             }
             Calendar c = Calendar.getInstance();
             c.setTime(date);
+            int SECONDS_BETWEEN_REFRESH = 500;
             c.add(SECOND, SECONDS_BETWEEN_REFRESH);
             if (c.before(Calendar.getInstance())) {
-//                Toast.makeText(getApplicationContext(), "20 sec passed", Toast.LENGTH_LONG).show();
                 return true;
             } else{
                 return false;
@@ -326,14 +294,6 @@ public class MainActivity extends AppCompatActivity {
                         moonViewModel.setMoonInfo(moonInfo);
                         sunViewModel.setSunInfo(sunInfo);
                         if(isTablet){
-//                            FragmentTransaction ft = fm.beginTransaction();
-//
-//                            moonInfoFragment = MoonInfoFragment.newInstance();
-//                            ft.replace(R.id.fragment_container, moonInfoFragment);
-//
-//                            sunInfoFragment = SunInfoFragment.newInstance();
-//                            ft.replace(R.id.fragment_container2, sunInfoFragment);
-//                            ft.commit();
                             vpWeather.getAdapter().notifyDataSetChanged();
                             vpSunMoon.getAdapter().notifyDataSetChanged();
                         } else {
@@ -355,11 +315,8 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onResume() {
         super.onResume();
-
         handler.post(sunAndMoonRunnable);
         handler.post(timeRunnable);
-
-//        Toast.makeText(getApplicationContext(), "resumed", Toast.LENGTH_SHORT).show();
     }
 
     @Override
@@ -367,12 +324,12 @@ public class MainActivity extends AppCompatActivity {
         super.onPause();
         handler.removeCallbacks(timeRunnable);
         handler.removeCallbacks(sunAndMoonRunnable);
-//        Toast.makeText(getApplicationContext(), "paused", Toast.LENGTH_SHORT).show();
     }
 
+
+
     public static boolean isConnectedToNetwork(Context context) {
-        ConnectivityManager connectivityManager =
-                (ConnectivityManager) context.getSystemService(Context.CONNECTIVITY_SERVICE);
+        ConnectivityManager connectivityManager = (ConnectivityManager) context.getSystemService(Context.CONNECTIVITY_SERVICE);
 
         boolean isConnected = false;
         if (connectivityManager != null) {
@@ -383,14 +340,14 @@ public class MainActivity extends AppCompatActivity {
         return isConnected;
     }
 
-    public void findWeather(String cityId, String units)
-    {
-        StringBuilder urlBuilder = new StringBuilder();
-        urlBuilder.append("http://api.openweathermap.org/data/2.5/weather?id=").append(cityId)
-                .append("&appid=2e4f5773b45fa8319b89a903841ba0c4&units=").append(units);
-        String url = urlBuilder.toString();
 
-        JsonObjectRequest jorw = new JsonObjectRequest(Request.Method.GET, url, null, new Response.Listener<JSONObject>() {
+
+    public void refreshment(String cityId, String units){
+        StringBuilder urlBuilderWeather = new StringBuilder();
+        urlBuilderWeather.append("http://api.openweathermap.org/data/2.5/weather?id=").append(cityId).append("&appid=2e4f5773b45fa8319b89a903841ba0c4&units=").append(units);
+        String url = urlBuilderWeather.toString();
+
+        JsonObjectRequest jsonWeather = new JsonObjectRequest(Request.Method.GET, url, null, new Response.Listener<JSONObject>() {
             @Override
             public void onResponse(JSONObject response) {
                 try
@@ -400,8 +357,8 @@ public class MainActivity extends AppCompatActivity {
                     preferencesEditor.putString(PREF_LAST_SAVED_DATE, currentDate);
                     preferencesEditor.commit();
 
-                    writeToFile(WEATHER_JSON_FILE_NAME, response.toString());
-                    updateWeatherFromJsonObject(response);
+                    writeDataToFile(WEATHER_JSON_FILE_NAME, response.toString());
+                    getWeather(response);
 
                 }catch(JSONException e)
                 {
@@ -412,23 +369,22 @@ public class MainActivity extends AppCompatActivity {
         }, new Response.ErrorListener() {
             @Override
             public void onErrorResponse(VolleyError error) {
-                Toast.makeText(getApplicationContext(), "error today weather", Toast.LENGTH_SHORT).show();
+                Toast.makeText(getApplicationContext(), "error", Toast.LENGTH_SHORT).show();
             }
         }
         );
 
-        StringBuilder urlBuilder2 = new StringBuilder();
-        urlBuilder2.append("http://api.openweathermap.org/data/2.5/forecast?id=").append(cityId)
-                .append("&appid=2e4f5773b45fa8319b89a903841ba0c4&units=").append(units);
-        String url2 = urlBuilder2.toString();
+        StringBuilder urlBuilderForecast = new StringBuilder();
+        urlBuilderForecast.append("http://api.openweathermap.org/data/2.5/forecast?id=").append(cityId).append("&appid=2e4f5773b45fa8319b89a903841ba0c4&units=").append(units);
+        String url2 = urlBuilderForecast.toString();
 
-        JsonObjectRequest jorf = new JsonObjectRequest(Request.Method.GET, url2, null, new Response.Listener<JSONObject>() {
+        JsonObjectRequest jsonForecast = new JsonObjectRequest(Request.Method.GET, url2, null, new Response.Listener<JSONObject>() {
             @Override
             public void onResponse(JSONObject response) {
                 try
                 {
-                    writeToFile(FORECAST_JSON_FILE_NAME, response.toString());
-                    updateForecastFromJsonObject(response);
+                    writeDataToFile(FORECAST_JSON_FILE_NAME, response.toString());
+                    getForecast(response);
 
                 }catch(JSONException e)
                 {
@@ -439,28 +395,30 @@ public class MainActivity extends AppCompatActivity {
         }, new Response.ErrorListener() {
             @Override
             public void onErrorResponse(VolleyError error) {
-                Toast.makeText(getApplicationContext(), "error forecast", Toast.LENGTH_SHORT).show();
+                Toast.makeText(getApplicationContext(), "error", Toast.LENGTH_SHORT).show();
             }
         }
         );
 
         RequestQueue queue = Volley.newRequestQueue(this);
-        queue.add(jorw);
-        queue.add(jorf);
+        queue.add(jsonWeather);
+        queue.add(jsonForecast);
 
     }
 
-    private void getWeatherAndForecastFromFile() throws JSONException {
-        String s = readFromFile(WEATHER_JSON_FILE_NAME);
+
+
+    private void getDataFromFile() throws JSONException {
+        String s = readDataFromFile(WEATHER_JSON_FILE_NAME);
         JSONObject weather = new JSONObject(s);
-        updateWeatherFromJsonObject(weather);
+        getWeather(weather);
 
-        String f = readFromFile(FORECAST_JSON_FILE_NAME);
+        String f = readDataFromFile(FORECAST_JSON_FILE_NAME);
         JSONObject forecast = new JSONObject(f);
-        updateForecastFromJsonObject(forecast);
+        getForecast(forecast);
     }
 
-    private void updateForecastFromJsonObject(JSONObject response) throws JSONException {
+    private void getForecast(JSONObject response) throws JSONException {
         Calendar c = getInstance();
         JSONArray array = response.getJSONArray("list");
 
@@ -470,7 +428,7 @@ public class MainActivity extends AppCompatActivity {
         JSONArray weather_array = object.getJSONArray("weather");
         JSONObject weather_object = weather_array.getJSONObject(0);
         String description = weather_object.getString("description");
-        String icon = "o"+weather_object.getString("icon");
+        String icon = "my_" + weather_object.getString("icon");
         c.add(DAY_OF_MONTH,1);
 
         forecastViewModel.setDate1(simpleDateFormat.format(c.getTime()));
@@ -484,7 +442,7 @@ public class MainActivity extends AppCompatActivity {
         weather_array = object.getJSONArray("weather");
         weather_object = weather_array.getJSONObject(0);
         description = weather_object.getString("description");
-        icon = "o"+weather_object.getString("icon");
+        icon = "my_" + weather_object.getString("icon");
         c.add(DAY_OF_MONTH,1);
 
         forecastViewModel.setDate2(simpleDateFormat.format(c.getTime()));
@@ -498,7 +456,7 @@ public class MainActivity extends AppCompatActivity {
         weather_array = object.getJSONArray("weather");
         weather_object = weather_array.getJSONObject(0);
         description = weather_object.getString("description");
-        icon = "o"+weather_object.getString("icon");
+        icon = "my_" + weather_object.getString("icon");
         c.add(DAY_OF_MONTH,1);
 
         forecastViewModel.setDate3(simpleDateFormat.format(c.getTime()));
@@ -512,7 +470,7 @@ public class MainActivity extends AppCompatActivity {
         weather_array = object.getJSONArray("weather");
         weather_object = weather_array.getJSONObject(0);
         description = weather_object.getString("description");
-        icon = "o"+weather_object.getString("icon");
+        icon = "my_" + weather_object.getString("icon");
         c.add(DAY_OF_MONTH,1);
 
         forecastViewModel.setDate4(simpleDateFormat.format(c.getTime()));
@@ -521,14 +479,6 @@ public class MainActivity extends AppCompatActivity {
         forecastViewModel.setDate4Image(icon);
 
         if(isTablet){
-//            FragmentTransaction ft = fm.beginTransaction();
-//
-//            moonInfoFragment = MoonInfoFragment.newInstance();
-//            ft.replace(R.id.fragment_container, moonInfoFragment);
-//
-//            sunInfoFragment = SunInfoFragment.newInstance();
-//            ft.replace(R.id.fragment_container2, sunInfoFragment);
-//            ft.commit();
             vpWeather.getAdapter().notifyDataSetChanged();
             vpSunMoon.getAdapter().notifyDataSetChanged();
         } else {
@@ -536,8 +486,7 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
-
-    private void updateWeatherFromJsonObject(JSONObject response) throws JSONException {
+    private void getWeather(JSONObject response) throws JSONException {
 
         JSONObject main_object = response.getJSONObject("main");
         JSONObject wind_object = response.getJSONObject("wind");
@@ -552,27 +501,21 @@ public class MainActivity extends AppCompatActivity {
         String wind_deg = String.valueOf(Double.isNaN(deg) ? "no data" : deg);
         String visibility = response.getString("visibility");
         String description = object.getString("description");
-        String icon = "o"+object.getString("icon");
+        String icon = "my_" + object.getString("icon");
 
         locationViewModel.setTemp(temp);
         locationViewModel.setWeather(description);
         locationViewModel.setPressure(press);
         locationViewModel.setIcon(icon);
+        locationViewModel.setUnit(preferences.getString(PREF_UNITS_FIELD, "default"));
 
         windViewModel.setWindForce(wind_speed);
         windViewModel.setWindDirection(wind_deg);
         windViewModel.setHumidity(hum);
         windViewModel.setVisibility(visibility);
+        windViewModel.setUnit(preferences.getString(PREF_UNITS_FIELD, "default"));
 
         if(isTablet){
-//            FragmentTransaction ft = fm.beginTransaction();
-//
-//            moonInfoFragment = MoonInfoFragment.newInstance();
-//            ft.replace(R.id.fragment_container, moonInfoFragment);
-//
-//            sunInfoFragment = SunInfoFragment.newInstance();
-//            ft.replace(R.id.fragment_container2, sunInfoFragment);
-//            ft.commit();
             vpWeather.getAdapter().notifyDataSetChanged();
             vpSunMoon.getAdapter().notifyDataSetChanged();
         } else {
@@ -580,19 +523,20 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
-    private void writeToFile(String filename, String data) {
+
+
+    private void writeDataToFile(String filename, String data) {
         try {
             OutputStreamWriter outputStreamWriter = new OutputStreamWriter(openFileOutput(filename, Context.MODE_PRIVATE));
             outputStreamWriter.write(data);
             outputStreamWriter.close();
         }
         catch (IOException e) {
-            Log.e("Exception", "File write failed: " + e.toString());
+//            Log.e("Exception", "File write failed: " + e.toString());
         }
     }
 
-
-    private String readFromFile(String filename) {
+    private String readDataFromFile(String filename) {
 
         String ret = "";
 
@@ -614,14 +558,12 @@ public class MainActivity extends AppCompatActivity {
             }
         }
         catch (FileNotFoundException e) {
-            Toast.makeText(getApplicationContext(), "No data to show. Turn on internet connection.", Toast.LENGTH_SHORT).show();
-            Log.e("login activity", "File not found: " + e.toString());
+            Toast.makeText(getApplicationContext(), "nie ma połączenia z internetem", Toast.LENGTH_SHORT).show();
+//            Log.e("login activity", "File not found: " + e.toString());
         } catch (IOException e) {
-            Log.e("login activity", "Can not read file: " + e.toString());
+//            Log.e("login activity", "Can not read file: " + e.toString());
         }
 
         return ret;
     }
-
-
 }

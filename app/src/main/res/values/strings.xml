@@ -43,8 +43,8 @@
     <string name="sun_and_moon_refresh_frequency_s">Sun and moon refresh frequency [s] :</string>
     <string name="refresh_weather">Refresh weather</string>
     <string-array name="units_array">
-        <item>Default</item>
-        <item>Metric</item>
-        <item>Imperial</item>
+        <item>default</item>
+        <item>metric</item>
+        <item>imperial</item>
     </string-array>
 </resources>

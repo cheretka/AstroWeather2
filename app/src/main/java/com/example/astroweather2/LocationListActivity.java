@@ -5,54 +5,33 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.database.Cursor;
 import android.os.Bundle;
-import android.support.v4.app.FragmentTransaction;
 import android.support.v4.widget.SimpleCursorAdapter;
 import android.support.v7.app.AppCompatActivity;
-import android.text.TextUtils;
-import android.view.Menu;
-import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.Button;
 import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
+import com.example.astroweather2.database.MyDatabase;
+import com.example.astroweather2.database.DatabaseHelper;
 
-import com.astrocalculator.AstroCalculator;
-import com.astrocalculator.AstroDateTime;
+import org.json.JSONObject;
 
-import java.util.Calendar;
 
 public class LocationListActivity extends AppCompatActivity {
-
-    private DBManager dbManager;
-
-    private ListView listView;
-    private Button addBtn;
-    private Button chooseBtn;
 
     private String cityName;
     private String cityId;
     private String cityLati;
     private String cityLongi;
-
     private SharedPreferences preferences;
-
-    private final String PREF_FILE_NAME = "astroPreferences";
-    private final String PREF_LATITUDE_FIELD = "latitudeField";
-    private final String PREF_LONGITUDE_FIELD = "longitudeField";
-    private final String PREF_FREQUENCY_FIELD = "frequencyField";
-    private final String PREF_CITY_NAME_FIELD = "cityNameField";
-    private final String PREF_CITY_ID_FIELD = "cityIdField";
-    private final String PREF_UNITS_FIELD = "unitsField";
-
     private SimpleCursorAdapter adapter;
+    private MyDatabase myDatabase;
 
-    final String[] from = new String[] {
-            DatabaseHelper.NAME, DatabaseHelper.CITY_ID,
-            DatabaseHelper.LATI, DatabaseHelper.LONGI };
 
-    final int[] to = new int[] { R.id.city_name, R.id.city_id, R.id.city_lati, R.id.city_longi };
+    final String[] fromArray = new String[] {DatabaseHelper.NAME, DatabaseHelper.CITY_ID, DatabaseHelper.LATI, DatabaseHelper.LONGI };
+    final int[] toArray = new int[] { R.id.city_name, R.id.city_id, R.id.city_lati, R.id.city_longi };
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -60,17 +39,18 @@ public class LocationListActivity extends AppCompatActivity {
 
         setContentView(R.layout.locations_list);
 
-        preferences = getSharedPreferences(PREF_FILE_NAME, Activity.MODE_PRIVATE);
+        preferences = getSharedPreferences("astroPreferences", Activity.MODE_PRIVATE);
 
-        dbManager = new DBManager(this);
-        dbManager.open();
-        Cursor cursor = dbManager.fetch();
+        myDatabase = new MyDatabase(this);
+        myDatabase.open();
+        Cursor cursor = myDatabase.fetch();
 
-        listView = findViewById(R.id.list_view);
-        addBtn = findViewById(R.id.addBtn);
-        chooseBtn = findViewById(R.id.chooseBtn);
+        ListView listView = findViewById(R.id.list_view);
+        Button addBtn = findViewById(R.id.addBtn);
+        Button chooseBtn = findViewById(R.id.chooseBtn);
+        Button deleteBtn = findViewById(R.id.deleteBtn);
 
-        adapter = new SimpleCursorAdapter(this, R.layout.locations_view_record, cursor, from, to, 0);
+        adapter = new SimpleCursorAdapter(this, R.layout.locations_view_record, cursor, fromArray, toArray, 0);
         adapter.notifyDataSetChanged();
 
         listView.setAdapter(adapter);
@@ -82,7 +62,6 @@ public class LocationListActivity extends AppCompatActivity {
                 TextView cityIdTextView = view.findViewById(R.id.city_id);
                 TextView cityLatiTextView = view.findViewById(R.id.city_lati);
                 TextView cityLongiTextView = view.findViewById(R.id.city_longi);
-
                 cityName = cityNameTextView.getText().toString();
                 cityId = cityIdTextView.getText().toString();
                 cityLati = cityLatiTextView.getText().toString();
@@ -103,25 +82,37 @@ public class LocationListActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 if(cityName == null || cityId == null || cityLati == null || cityLongi == null ){
-                    Toast.makeText(getApplicationContext(), "No city selected", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(getApplicationContext(), "proszę wybrać miasto z listy", Toast.LENGTH_SHORT).show();
                 } else {
                     if(MainActivity.isConnectedToNetwork(getApplicationContext())){
                         SharedPreferences.Editor preferencesEditor = preferences.edit();
-                        preferencesEditor.putString(PREF_CITY_ID_FIELD, cityId);
-                        preferencesEditor.putString(PREF_CITY_NAME_FIELD, cityName);
-                        preferencesEditor.putString(PREF_LATITUDE_FIELD, cityLati);
-                        preferencesEditor.putString(PREF_LONGITUDE_FIELD, cityLongi);
+                        preferencesEditor.putString("cityIdField", cityId);
+                        preferencesEditor.putString("cityNameField", cityName);
+                        preferencesEditor.putString("latitudeField", cityLati);
+                        preferencesEditor.putString("longitudeField", cityLongi);
                         preferencesEditor.commit();
                         Intent returnIntent = new Intent();
                         setResult(Activity.RESULT_OK, returnIntent);
                         finish();
                     } else {
-                        Toast.makeText(getApplicationContext(), "No internet connection", Toast.LENGTH_SHORT).show();
+                        Toast.makeText(getApplicationContext(), "nie ma połączenia z netem", Toast.LENGTH_SHORT).show();
                     }
-
                 }
+            }
+        });
 
 
+        deleteBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if(cityName == null || cityId == null || cityLati == null || cityLongi == null ){
+                    Toast.makeText(getApplicationContext(), "proszę wybrać miasto z listy", Toast.LENGTH_SHORT).show();
+                } else {
+                    myDatabase.delete(Long.parseLong(cityId));
+                    Intent intent = new Intent(getApplicationContext(), LocationListActivity.class);
+                    startActivity(intent);
+                    finish();
+                }
             }
         });
     }

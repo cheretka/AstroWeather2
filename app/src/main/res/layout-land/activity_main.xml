@@ -5,153 +5,130 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="horizontal"
+    android:paddingHorizontal="40dp"
+    android:background="#C3E0FF"
     tools:context=".MainActivity">
 
-    <android.support.constraint.ConstraintLayout
+
+    <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:layout_margin="5dp"
-        android:layout_weight="1">
-
-        <TextView
-            android:id="@+id/timeText"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="5sp"
-            android:text="@string/blank"
-            android:textSize="@dimen/text_size"
-            app:layout_constraintBottom_toTopOf="@+id/latitudeLabel"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintHorizontal_bias="0.5"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent" />
-
-        <TextView
-            android:id="@+id/latitudeLabel"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="@string/latitude"
-            android:textSize="@dimen/text_size"
-            app:layout_constraintBottom_toTopOf="@+id/longitudeLabel"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintEnd_toStartOf="@+id/latitudeText"
-            app:layout_constraintHorizontal_bias="0.5"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/timeText" />
-
-        <TextView
-            android:id="@+id/longitudeLabel"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="@string/longitude"
-            android:textSize="@dimen/text_size"
-            app:layout_constraintBottom_toTopOf="@+id/cityLabel"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintEnd_toStartOf="@+id/longitudeText"
-            app:layout_constraintHorizontal_bias="0.5"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/latitudeLabel" />
-
-        <TextView
-            android:id="@+id/latitudeText"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="@string/blank"
-            android:textSize="@dimen/text_size"
-            app:layout_constraintBottom_toBottomOf="@+id/latitudeLabel"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintHorizontal_bias="0.5"
-            app:layout_constraintStart_toEndOf="@+id/latitudeLabel"
-            app:layout_constraintTop_toBottomOf="@+id/timeText"
-            app:layout_constraintTop_toTopOf="@+id/latitudeLabel" />
-
-        <TextView
-            android:id="@+id/longitudeText"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginStart="8dp"
-            android:text="@string/blank"
-            android:textSize="@dimen/text_size"
-            app:layout_constraintBottom_toBottomOf="@+id/longitudeLabel"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintHorizontal_bias="0.5"
-            app:layout_constraintStart_toEndOf="@+id/longitudeLabel"
-            app:layout_constraintTop_toTopOf="@+id/longitudeLabel" />
-
-        <TextView
-            android:id="@+id/cityLabel"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginStart="5dp"
-            android:layout_marginEnd="5dp"
-            android:text="@string/city"
-            android:textSize="@dimen/text_size"
-            app:layout_constraintBottom_toTopOf="@+id/optionsButton"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintEnd_toStartOf="@+id/cityText"
-            app:layout_constraintHorizontal_bias="0.5"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/longitudeLabel" />
-
-        <TextView
-            android:id="@+id/cityText"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="@string/blank"
-            android:textSize="@dimen/text_size"
-            app:layout_constraintBottom_toTopOf="@+id/optionsButton"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintHorizontal_bias="0.5"
-            app:layout_constraintStart_toEndOf="@+id/cityLabel"
-            app:layout_constraintTop_toBottomOf="@+id/longitudeText" />
-
-        <Button
-            android:id="@+id/optionsButton"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginBottom="5sp"
-            android:text="@string/options"
-            android:textAppearance="@style/TextAppearance.AppCompat.Small"
-            android:textSize="@dimen/text_size"
-            app:layout_constraintBottom_toTopOf="@+id/changeCityBtn"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintHorizontal_bias="0.5"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/cityText" />
-
-        <Button
-            android:id="@+id/changeCityBtn"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginBottom="8dp"
-            android:text="@string/change_city"
-            android:textAppearance="@style/TextAppearance.AppCompat.Small"
-            android:textSize="@dimen/text_size"
-            app:layout_constraintBottom_toTopOf="@+id/refreshBtn"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintHorizontal_bias="0.5"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/optionsButton"
-            app:layout_constraintVertical_bias="0.0" />
+        android:layout_weight="3"
+        android:orientation="vertical"
+        android:layout_marginRight="20dp"
+        android:layout_marginVertical="10dp"
+        android:paddingBottom="20dp">
 
         <Button
             android:id="@+id/refreshBtn"
-            android:layout_width="wrap_content"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="@string/refresh_weather"
-            android:textAppearance="@style/TextAppearance.AppCompat.Small"
-            android:textSize="@dimen/text_size"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintHorizontal_bias="0.5"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/changeCityBtn" />
-    </android.support.constraint.ConstraintLayout>
+            android:background="#FFFFFF"
+            android:layout_margin="2dp"
+            android:text="odświeżyć dane"  />
+
+        <Button
+            android:id="@+id/changeCityBtn"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="#FFFFFF"
+            android:layout_margin="2dp"
+            android:text="zmiana lokalizacji" />
+
+        <Button
+            android:id="@+id/optionsButton"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="#FFFFFF"
+            android:layout_margin="2dp"
+            android:text="ustawienia" />
+
+        <TextView
+            android:id="@+id/timeText"
+            android:layout_width="match_parent"
+            android:layout_height="70dp"
+            android:paddingBottom="10dp"
+            android:textAlignment="center"
+            android:textColor="@color/black"
+            android:textSize="20sp" />
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:orientation="horizontal">
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_weight="1"
+                android:textAlignment="center"
+                android:textColor="@color/black"
+                android:text="szerokość geogr." />
+
+            <TextView
+                android:id="@+id/latitudeText"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:textColor="@color/black"
+                android:layout_weight="2" />
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:orientation="horizontal">
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_weight="1"
+                android:textAlignment="center"
+                android:textColor="@color/black"
+                android:text="długość geogr." />
+
+            <TextView
+                android:id="@+id/longitudeText"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:textColor="@color/black"
+                android:layout_weight="2" />
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:orientation="horizontal">
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_weight="1"
+                android:textAlignment="center"
+                android:textColor="@color/black"
+                android:text="miejscowosc" />
+
+            <TextView
+                android:id="@+id/cityText"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:textColor="@color/black"
+                android:layout_weight="2" />
+        </LinearLayout>
+
+
+
+    </LinearLayout>
+
 
     <android.support.v4.view.ViewPager
         android:id="@+id/vp"
-        android:layout_width="match_parent"
+        android:layout_width="wrap_content"
         android:layout_height="match_parent"
-        android:layout_weight="1" />
+        android:layout_weight="2"
+        android:background="#FFFFFF" />
+
 
 </LinearLayout>

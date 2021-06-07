@@ -11,7 +11,7 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
-        <activity android:name="com.example.astroweather2.MainActivity">
+        <activity android:name="com.example.astroweather2.MainActivity" android:theme= "@style/Theme.AppCompat.Light.NoActionBar">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
@@ -21,7 +21,8 @@
         <activity
             android:name="com.example.astroweather2.OptionsActivity"
             android:label="@string/options_activity_name"
-            android:parentActivityName="com.example.astroweather2.MainActivity">
+            android:parentActivityName="com.example.astroweather2.MainActivity"
+            android:theme= "@style/Theme.AppCompat.Light.NoActionBar">
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value="com.example.astroweather2.MainActivity" />
@@ -29,7 +30,8 @@
         <activity
             android:name="com.example.astroweather2.LocationListActivity"
             android:label="@string/location_list_activity_name"
-            android:parentActivityName="com.example.astroweather2.MainActivity">
+            android:parentActivityName="com.example.astroweather2.MainActivity"
+            android:theme= "@style/Theme.AppCompat.Light.NoActionBar">
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value="com.example.astroweather2.MainActivity" />
@@ -37,7 +39,8 @@
         <activity
             android:name="com.example.astroweather2.AddLocationActivity"
             android:label="@string/add_location_activity_name"
-            android:parentActivityName="com.example.astroweather2.LocationListActivity">
+            android:parentActivityName="com.example.astroweather2.LocationListActivity"
+            android:theme= "@style/Theme.AppCompat.Light.NoActionBar">
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value="com.example.astroweather2.LocationListActivity" />>
